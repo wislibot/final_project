@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/settings/preference_tile.dart';
 import '../../widgets/settings/section_card.dart';
+import '../../widgets/settings/debug_section.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -10,12 +11,10 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
               const Text(
                 "Settings",
@@ -69,7 +68,11 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
+              ),
+
+              const SizedBox(height: 24),
+
+              const DebugSection(),
             ],
           ),
         ),

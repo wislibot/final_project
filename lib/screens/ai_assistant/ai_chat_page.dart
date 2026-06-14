@@ -21,6 +21,10 @@ import '../../repositories/reminder_repository.dart';
 import '../../widgets/chat/chat_header.dart';
 import '../../core/services/habit_analyzer_service.dart';
 import '../../core/services/weekly_report_service.dart';
+import '../../core/services/date_override_service.dart';
+import '../../core/services/spending_analyzer_service.dart';
+import '../../models/weekly_snapshot_model.dart';
+import '../../repositories/weekly_snapshot_repository.dart';
 
 
 class AIChatPage extends StatefulWidget {
@@ -510,33 +514,82 @@ class _AIChatPageState extends State<AIChatPage> {
 
   Future<void> generateWeeklyCoach() async {
     try {
-      final transactions =
-          await transactionRepository.fetchTransactions();
+      final dateService = await DateOverrideService.getInstance();
+      final now = dateService.now();
+      final daysFromMonday = now.weekday - 1;
+      final weekStart = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysFromMonday));
+      final weekEnd = weekStart.add(const Duration(days: 6));
 
-      final summary =
-          WeeklyReportService().generateSummary(transactions);
+      final transactions = await transactionRepository.fetchTransactions();
+      final weekTransactions = transactions.where((t) =>
+        t.createdAt.isAfter(weekStart.subtract(const Duration(seconds: 1))) &&
+        t.createdAt.isBefore(weekEnd.add(const Duration(days: 1)))
+      ).toList();
 
-      final reply =
-          await geminiService.weeklyReflection(summary);
+      final snapshotRepo = WeeklySnapshotRepository();
+      final existingSnapshots = await snapshotRepo.fetchSnapshots();
+
+      final currentSnapshot = WeeklySnapshotModel.fromTransactions(
+        weekStart: weekStart,
+        weekEnd: weekEnd,
+        transactions: weekTransactions.map((t) =>
+          TransactionData(amount: t.amount, category: t.category, date: t.createdAt)
+        ).toList(),
+      );
+
+      await snapshotRepo.saveSnapshot(currentSnapshot);
+
+      final allSnapshots = [currentSnapshot, ...existingSnapshots];
+      final analyzer = SpendingAnalyzerService();
+      final trends = analyzer.analyze(allSnapshots);
+
+      final buffer = StringBuffer();
+      buffer.writeln("=== Spending History (${allSnapshots.length} weeks) ===\n");
+
+      for (final s in allSnapshots.take(6)) {
+        buffer.writeln("Week of ${s.weekStart.month}/${s.weekStart.day}: \$${s.totalSpent.toStringAsFixed(2)} (${s.transactionCount} transactions)");
+        final cats = s.categoryBreakdown.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+        for (final c in cats.take(3)) {
+          buffer.writeln("  ${c.key}: \$${c.value.toStringAsFixed(2)}");
+        }
+        buffer.writeln();
+      }
+
+      buffer.writeln("=== Trends ===");
+      if (trends.weekOverWeekChange != null) {
+        final change = trends.weekOverWeekChange!;
+        buffer.writeln("Week-over-week: ${change > 0 ? '+' : ''}${change.toStringAsFixed(1)}%");
+      }
+      buffer.writeln("Average weekly: \$${trends.averageWeeklySpending.toStringAsFixed(2)}");
+      buffer.writeln("Savings streak: ${trends.savingsStreak} weeks");
+      if (trends.peakDay != null) buffer.writeln("Peak spending day: ${trends.peakDay}");
+      buffer.writeln("Consistency score: ${trends.spendingConsistency.toStringAsFixed(1)}% variation");
+
+      if (trends.categoryTrends.isNotEmpty) {
+        buffer.writeln("\nCategory trends:");
+        for (final entry in trends.categoryTrends.entries) {
+          final arrow = entry.value > 0 ? '↑' : '↓';
+          buffer.writeln("  ${entry.key}: ${arrow}${entry.value.abs().toStringAsFixed(1)}%");
+        }
+      }
+
+      final context = buffer.toString();
+      final reply = await geminiService.weeklyReflection(context);
 
       setState(() {
-        messages.add(
-          MessageModel(
-            text: reply,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ),
-        );
+        messages.add(MessageModel(
+          text: reply,
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
       });
     } catch (e) {
       setState(() {
-        messages.add(
-          MessageModel(
-            text: "Failed to generate weekly coaching insight.",
-            isUser: false,
-            timestamp: DateTime.now(),
-          ),
-        );
+        messages.add(MessageModel(
+          text: "Failed to generate weekly coaching insight.\n$e",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
       });
     }
   }
