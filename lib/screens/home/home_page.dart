@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../ai_assistant/ai_chat_page.dart';
 import '../analytics/analytics_page.dart';
 import '../settings/settings_page.dart';
+import '../../core/localization/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,56 +23,46 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       body: IndexedStack(
         index: currentIndex,
         children: pages,
       ),
-
-      floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked,
-
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFF00BFA6),
-          elevation: 6,
-          child: const Icon(
-            Icons.smart_toy,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            setState(() {
-              currentIndex = 1;
-            });
-          },
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF00BFA6),
+        elevation: 6,
+        child: const Icon(Icons.smart_toy, color: Colors.white),
+        onPressed: () => setState(() => currentIndex = 1),
+      ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 8,
-          child: SizedBox(
-            height: 70,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  icon: Icons.bar_chart_rounded,
-                  label: 'Analytics',
-                  isActive: currentIndex == 0,
-                  onTap: () => setState(() => currentIndex = 0),
-                ),
-
-                const SizedBox(width: 60),
-
-                _NavItem(
-                  icon: Icons.settings_rounded,
-                  label: 'Settings',
-                  isActive: currentIndex == 2,
-                  onTap: () => setState(() => currentIndex = 2),
-                ),
-              ],
-            ),
+        color: Colors.white,
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        child: SizedBox(
+          height: 70,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.bar_chart_rounded,
+                label: loc.analytics,
+                isActive: currentIndex == 0,
+                onTap: () => setState(() => currentIndex = 0),
+              ),
+              const SizedBox(width: 60),
+              _NavItem(
+                icon: Icons.settings_rounded,
+                label: loc.settings,
+                isActive: currentIndex == 2,
+                onTap: () => setState(() => currentIndex = 2),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
@@ -100,11 +91,7 @@ class _NavItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: isActive ? const Color(0xFF00BFA6) : Colors.grey,
-              size: 28,
-            ),
+            Icon(icon, color: isActive ? const Color(0xFF00BFA6) : Colors.grey, size: 28),
             const SizedBox(height: 4),
             Text(
               label,

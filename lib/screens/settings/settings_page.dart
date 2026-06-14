@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets/settings/preference_tile.dart';
 import '../../widgets/settings/section_card.dart';
 import '../../widgets/settings/debug_section.dart';
+import '../../core/localization/app_localizations.dart';
+import '../../core/providers/localization_provider.dart';
+import 'language_picker_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -16,9 +22,9 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Settings",
-                style: TextStyle(
+              Text(
+                loc.settings,
+                style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
@@ -31,40 +37,26 @@ class SettingsPage extends StatelessWidget {
                   children: [
                     PreferenceTile(
                       icon: Icons.person,
-                      title: "Profile",
-                      onTap: () => _showComingSoon(context, "Profile"),
+                      title: loc.profile,
+                      onTap: () => _showComingSoon(context, loc.profile),
                     ),
 
                     const Divider(),
 
-                    PreferenceTile(
-                      icon: Icons.palette,
-                      title: "Appearance",
-                      onTap: () => _showComingSoon(context, "Appearance"),
-                    ),
-
-                    const Divider(),
-
-                    PreferenceTile(
-                      icon: Icons.language,
-                      title: "Language",
-                      onTap: () => _showComingSoon(context, "Language"),
-                    ),
-
-                    const Divider(),
-
-                    PreferenceTile(
-                      icon: Icons.security,
-                      title: "Privacy",
-                      onTap: () => _showComingSoon(context, "Privacy"),
-                    ),
-
-                    const Divider(),
-
-                    PreferenceTile(
-                      icon: Icons.help_outline,
-                      title: "Help",
-                      onTap: () => _showComingSoon(context, "Help"),
+                    Consumer<LocalizationProvider>(
+                      builder: (context, localeProvider, _) {
+                        return PreferenceTile(
+                          icon: Icons.language,
+                          title: loc.languageSetting,
+                          subtitle: localeProvider.isEnglish ? 'English' : '繁體中文',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const LanguagePickerPage()),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -81,9 +73,10 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _showComingSoon(BuildContext context, String feature) {
+    final loc = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature settings coming soon'),
+        content: Text('$feature ${loc.comingSoon}'),
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xFF00BFA6),
         duration: const Duration(seconds: 2),

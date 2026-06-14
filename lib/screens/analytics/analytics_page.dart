@@ -6,6 +6,7 @@ import '../../models/budget_model.dart';
 import '../../repositories/transaction_repository.dart';
 import '../../repositories/budget_repository.dart';
 import '../../core/services/insights_service.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../widgets/analytics/overview_card.dart';
 import '../../widgets/analytics/monthly_progress_card.dart';
 import '../../widgets/analytics/insights_section.dart';
@@ -137,12 +138,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                             bottomRight: Radius.circular(28),
                           ),
                         ),
-                        child: Column(
+                        final loc = AppLocalizations.of(context);
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("Analytics", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                            Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 6),
-                            Text("Your financial insights", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
+                            Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
                           ],
                         ),
                       ),
