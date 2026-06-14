@@ -2,26 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../repositories/transaction_repository.dart';
-import '../../widgets/analytics/insight_card.dart';
-import '../../widgets/analytics/monthly_progress_card.dart';
 import '../../widgets/analytics/overview_card.dart';
+import '../../widgets/analytics/monthly_progress_card.dart';
 import '../../widgets/analytics/chart_section.dart';
-
 
 class AnalyticsPage extends StatelessWidget {
   const AnalyticsPage({super.key});
 
-  Future<void> selectDateRange(
-        BuildContext context) async {
-
-      await showDateRangePicker(
-        context: context,
-
-        firstDate: DateTime(2024),
-
-        lastDate: DateTime.now(),
-      );
-    }
   @override
   Widget build(BuildContext context) {
     final repository = TransactionRepository();
@@ -32,57 +19,113 @@ class AnalyticsPage extends StatelessWidget {
           stream: repository.getTransactions(),
           builder: (context, snapshot) {
             final Map<String, double> categoryTotals = {};
+            double totalSpent = 0;
+            double todaySpent = 0;
+            final now = DateTime.now();
 
             if (snapshot.hasData) {
               for (final doc in snapshot.data!.docs) {
                 final data = doc.data() as Map<String, dynamic>;
-
                 final category = data["category"] ?? "Other";
                 final amount = double.parse(data["amount"].toString());
+                final type = data["type"] ?? "expense";
 
                 categoryTotals[category] =
                     (categoryTotals[category] ?? 0) + amount;
+
+                if (type != "income") {
+                  totalSpent += amount;
+
+                  // Check if today
+                  final createdAt = data["createdAt"];
+                  if (createdAt != null) {
+                    final date = (createdAt as Timestamp).toDate();
+                    if (date.year == now.year &&
+                        date.month == now.month &&
+                        date.day == now.day) {
+                      todaySpent += amount;
+                    }
+                  }
+                }
               }
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Analytics",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                  // ── Dark navy header ──
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF0B2447),
+                          Color(0xFF19376D),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(28),
+                        bottomRight: Radius.circular(28),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Analytics",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Your financial insights",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 20),
 
-                  Text(
-                    "Your financial insights",
-                    style: TextStyle(
-                      color: Colors.grey[600],
+                  // ── Overview Card ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: OverviewCard(
+                      monthlySpent: totalSpent,
+                      todaySpent: todaySpent,
                     ),
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 16),
 
-                  const OverviewCard(),
+                  // ── Monthly Progress Card ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: MonthlyProgressCard(
+                      totalSpent: totalSpent,
+                      budgetLimit: 1600,
+                    ),
+                  ),
 
                   const SizedBox(height: 20),
 
-                  const MonthlyProgressCard(),
-
-                  const SizedBox(height: 20),
-
-                  const InsightCard(),
-
-                  const SizedBox(height: 20),
-
-                  ChartSection(
-                    categoryTotals: categoryTotals,
+                  // ── Chart Section ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ChartSection(
+                      categoryTotals: categoryTotals,
+                    ),
                   ),
                 ],
               ),

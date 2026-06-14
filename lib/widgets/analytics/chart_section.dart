@@ -25,7 +25,7 @@ class ChartSection extends StatelessWidget {
           color: Colors.white,
 
           borderRadius:
-              BorderRadius.circular(28),
+              BorderRadius.circular(24),
 
           boxShadow: [
             BoxShadow(
@@ -42,19 +42,28 @@ class ChartSection extends StatelessWidget {
         child: Column(
           children: [
 
-            const TabBar(
-
+            TabBar(
               labelColor:
-                  Color(0xFF00BFA6),
+                  const Color(0xFF00BFA6),
 
               unselectedLabelColor:
                   Colors.grey,
 
-              tabs: [
+              indicatorColor: const Color(0xFF00BFA6),
+              indicatorWeight: 3,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 13,
+              ),
+              tabs: const [
 
                 Tab(
                   text:
-                      "Budget",
+                      "Budget vs Spent",
                 ),
 
                 Tab(
@@ -96,4 +105,3 @@ class ChartSection extends StatelessWidget {
     );
   }
 }
-
