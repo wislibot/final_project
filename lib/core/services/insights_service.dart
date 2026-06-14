@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/insight_model.dart';
-import '../models/transaction_model.dart';
-import '../models/budget_model.dart';
+import '../../models/insight_model.dart';
+import '../../models/transaction_model.dart';
+import '../../models/budget_model.dart';
 
 class InsightsService {
   List<InsightModel> generateInsights(
