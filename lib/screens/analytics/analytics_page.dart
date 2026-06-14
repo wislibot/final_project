@@ -28,7 +28,7 @@ class AnalyticsPage extends StatelessWidget {
             if (snapshot.hasData) {
               for (final doc in snapshot.data!.docs) {
                 final data = doc.data() as Map<String, dynamic>;
-                final transaction = TransactionModel.fromMap(data);
+                final transaction = TransactionModel.fromMap(data, docId: doc.id);
                 allTransactions.add(transaction);
 
                 categoryTotals[transaction.category] =

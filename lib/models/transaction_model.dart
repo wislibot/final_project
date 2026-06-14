@@ -1,4 +1,5 @@
 class TransactionModel {
+  final String id;
   final String type;
   final String category;
   final double amount;
@@ -6,6 +7,7 @@ class TransactionModel {
   final DateTime createdAt;
 
   TransactionModel({
+    this.id = '',
     required this.type,
     required this.category,
     required this.amount,
@@ -22,18 +24,15 @@ class TransactionModel {
       'createdAt': createdAt,
     };
   }
-  factory TransactionModel.fromMap(
-    Map<String, dynamic> map) {
 
-  return TransactionModel(
-    type: map["type"],
-    category: map["category"],
-    amount: double.parse(
-      map["amount"].toString(),
-    ),
-    description: map["description"],
-    createdAt: map["createdAt"].toDate(),
-  );
-}
-
+  factory TransactionModel.fromMap(Map<String, dynamic> map, {String docId = ''}) {
+    return TransactionModel(
+      id: docId,
+      type: map["type"] ?? '',
+      category: map["category"] ?? 'Other',
+      amount: double.parse(map["amount"].toString()),
+      description: map["description"] ?? '',
+      createdAt: map["createdAt"] != null ? map["createdAt"].toDate() : DateTime.now(),
+    );
+  }
 }

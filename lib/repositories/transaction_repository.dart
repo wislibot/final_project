@@ -41,6 +41,7 @@ class TransactionRepository {
         .map(
           (doc) => TransactionModel.fromMap(
             doc.data(),
+            docId: doc.id,
           ),
         )
         .toList();
