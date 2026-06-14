@@ -322,57 +322,55 @@ class _AIChatPageState extends State<AIChatPage> {
       }
     }
     Future<void> recordReminder(String text) async {
-
       try {
-
-        String response =
-            await geminiService.extractReminder(text);
-
+        String response = await geminiService.extractReminder(text);
         response = response
             .replaceAll("```json", "")
             .replaceAll("```JSON", "")
             .replaceAll("```", "")
             .trim();
 
-        final data =
-            jsonDecode(response);
-
-        final reminder =
-            ReminderModel(
+        final data = jsonDecode(response);
+        final reminder = ReminderModel(
           title: data["title"],
           date: data["date"],
         );
 
-        await reminderRepository
-            .addReminder(reminder);
+        await reminderRepository.addReminder(reminder);
 
         setState(() {
           messages.add(
             MessageModel(
-              text:
-                  "Reminder '${reminder.title}' saved.",
+              text: "Reminder saved!",
               isUser: false,
               timestamp: DateTime.now(),
+              card: _buildInfoCard(
+                icon: Icons.notifications_active_rounded,
+                iconColor: const Color(0xFFFF8F00),
+                bgColor: const Color(0xFFFFF8E1),
+                borderColor: const Color(0xFFFFE082),
+                title: "Reminder Set",
+                fields: {
+                  "Title": reminder.title,
+                  "Date": reminder.date,
+                },
+              ),
             ),
           );
         });
-
       } catch (e) {
-
         setState(() {
           messages.add(
             MessageModel(
-              text:
-                  "Failed to save reminder.",
+              text: "Failed to save reminder. Please try again.\n$e",
               isUser: false,
               timestamp: DateTime.now(),
             ),
           );
         });
-
       }
-
     }
+
   Future<void> analyzeMonthlySpending() async {
 
     try {
