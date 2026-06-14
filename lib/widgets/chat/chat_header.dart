@@ -6,59 +6,78 @@ class ChatHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 160,
-      ),
-
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF08162D),
-            Color(0xFF0B2447),
-          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0B2447), Color(0xFF19376D)],
         ),
       ),
-
-      child: const Padding(
-        padding: EdgeInsets.all(25),
-
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-
-          mainAxisAlignment:
-              MainAxisAlignment.spaceEvenly,
-
+      child: SafeArea(
+        bottom: false,
+        child: Row(
           children: [
-
-            Text(
-              "AI Assistant",
-              style: TextStyle(
+            // Robot icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFF00BFA6),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
                 color: Colors.white,
-                fontSize: 32,
-                fontWeight:
-                    FontWeight.bold,
+                size: 28,
               ),
             ),
-
-            SizedBox(height: 8),
-
-            Text(
-              "Ready to help",
-              style: TextStyle(
-                color: Colors.white70,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "AI Assistant",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF4CAF50),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        "Ready to help",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Your smart financial companion",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            SizedBox(height: 6),
-
-            Text(
-              "Your smart financial companion",
-              style: TextStyle(
-                color: Colors.white60,
-              ),
-            ),
-
           ],
         ),
       ),

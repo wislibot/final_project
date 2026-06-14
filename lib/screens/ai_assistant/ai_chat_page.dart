@@ -149,59 +149,50 @@ class _AIChatPageState extends State<AIChatPage> {
   }
  
   Future<void> recordExpense(String text) async {
-
     try {
-
-      String response =
-          await geminiService.extractExpense(text);
-
+      String response = await geminiService.extractExpense(text);
       response = response
           .replaceAll("```json", "")
           .replaceAll("```JSON", "")
           .replaceAll("```", "")
           .trim();
 
-      final data =
-          jsonDecode(response);
-
-      final transaction =
-          TransactionModel(
+      final data = jsonDecode(response);
+      final transaction = TransactionModel(
         type: data["type"],
         category: data["category"],
-        amount: double.parse(
-          data["amount"].toString(),
-        ),
+        amount: double.parse(data["amount"].toString()),
         description: data["description"],
         createdAt: DateTime.now(),
       );
 
-      await transactionRepository
-          .addTransaction(transaction);
+      await transactionRepository.addTransaction(transaction);
 
       setState(() {
         messages.add(
           MessageModel(
-            text:
-                "Recorded ${transaction.category} expense of \$${transaction.amount}.",
+            text: "I've recorded your expense!",
             isUser: false,
             timestamp: DateTime.now(),
+            card: ExpenseRecordedCard(
+              description: transaction.description,
+              amount: transaction.amount.toStringAsFixed(2),
+              category: transaction.category,
+              date: "${transaction.createdAt.month}/${transaction.createdAt.day}/${transaction.createdAt.year}",
+            ),
           ),
         );
       });
-
     } catch (e) {
-
       setState(() {
         messages.add(
           MessageModel(
-            text:
-                "Failed to record expense.\n$e",
+            text: "Failed to record expense.\n$e",
             isUser: false,
             timestamp: DateTime.now(),
           ),
         );
       });
-
     }
   }
 
@@ -537,13 +528,9 @@ class _AIChatPageState extends State<AIChatPage> {
 
                   Expanded(
                     child: ListView.builder(
-                      itemCount:
-                          messages.length +
-                          (isLoading ? 1 : 0),
-
-                      itemBuilder:
-                          (context, index) {
-
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: messages.length + (isLoading ? 1 : 0),
+                      itemBuilder: (context, index) {
                         if (index == messages.length) {
                           return ChatBubble(
                             message: "Thinking...",
@@ -558,6 +545,7 @@ class _AIChatPageState extends State<AIChatPage> {
                           message: message.text,
                           isUser: message.isUser,
                           timestamp: message.timestamp,
+                          card: message.card,
                         );
                       },
                     ),
@@ -567,35 +555,27 @@ class _AIChatPageState extends State<AIChatPage> {
 
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-
                     child: Row(
                       children: [
                         QuickActionChip(
                           text: "✨ Record lunch \$15",
                           onTap: () => messageController.text = "Record lunch \$15",
                         ),
-
-                        const SizedBox(width: 10),
-
+                        const SizedBox(width: 8),
                         QuickActionChip(
-                          text: "📈 Analyze spending",
-                          onTap: () => messageController.text = "Analyze spending",
+                          text: "📊 Adjust my budget",
+                          onTap: () => messageController.text = "Adjust my budget",
                         ),
-
-                        const SizedBox(width: 10),
-
+                        const SizedBox(width: 8),
                         QuickActionChip(
-                          text: "💰 Set budget",
-                          onTap: () => messageController.text = "Set budget",
+                          text: "💸 Set spending",
+                          onTap: () => messageController.text = "Set spending limit",
                         ),
-
-                        const SizedBox(width: 10),
-
+                        const SizedBox(width: 8),
                         QuickActionChip(
                           text: "🔔 Set reminder",
                           onTap: () => messageController.text = "Set reminder",
                         ),
-
                       ],
                     ),
                   ),
