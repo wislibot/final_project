@@ -15,6 +15,13 @@ class TransactionRepository {
         );
   }
 
+  Future<void> deleteTransaction(String docId) async {
+    await firestore
+        .collection('transactions')
+        .doc(docId)
+        .delete();
+  }
+
   Stream<QuerySnapshot> getTransactions() {
     return firestore
         .collection('transactions')
@@ -24,18 +31,18 @@ class TransactionRepository {
         )
         .snapshots();
   }
+
   Future<List<TransactionModel>> fetchTransactions() async {
+    final snapshot = await firestore
+        .collection("transactions")
+        .get();
 
-      final snapshot = await firestore
-          .collection("transactions")
-          .get();
-
-      return snapshot.docs
-          .map(
-            (doc) => TransactionModel.fromMap(
-              doc.data(),
-            ),
-          )
-          .toList();
-    }
+    return snapshot.docs
+        .map(
+          (doc) => TransactionModel.fromMap(
+            doc.data(),
+          ),
+        )
+        .toList();
+  }
 }

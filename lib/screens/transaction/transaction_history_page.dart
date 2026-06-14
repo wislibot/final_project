@@ -19,10 +19,8 @@ class TransactionHistoryPage extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: repository.getTransactions(),
-
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -37,27 +35,16 @@ class TransactionHistoryPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.receipt_long_outlined,
-                    size: 80,
-                    color: Colors.grey[300],
-                  ),
+                  Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey[300]),
                   const SizedBox(height: 16),
                   Text(
                     "No transactions yet",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Start by recording your first expense",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                   ),
                 ],
               ),
@@ -68,11 +55,16 @@ class TransactionHistoryPage extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             itemCount: docs.length,
             itemBuilder: (context, index) {
+              final doc = docs[index];
               final transaction = TransactionModel.fromMap(
-                docs[index].data() as Map<String, dynamic>,
+                doc.data() as Map<String, dynamic>,
               );
 
-              return _TransactionTile(transaction: transaction);
+              return _TransactionTile(
+                transaction: transaction,
+                docId: doc.id,
+                repository: repository,
+              );
             },
           );
         },
@@ -83,8 +75,14 @@ class TransactionHistoryPage extends StatelessWidget {
 
 class _TransactionTile extends StatelessWidget {
   final TransactionModel transaction;
+  final String docId;
+  final TransactionRepository repository;
 
-  const _TransactionTile({required this.transaction});
+  const _TransactionTile({
+    required this.transaction,
+    required this.docId,
+    required this.repository,
+  });
 
   IconData _categoryIcon(String category) {
     final cat = category.toLowerCase();
@@ -105,83 +103,128 @@ class _TransactionTile extends StatelessWidget {
     }
   }
 
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Delete Transaction"),
+        content: Text("Remove \"${transaction.description}\" (${transaction.category})?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              repository.deleteTransaction(docId);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Transaction deleted"),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isExpense = transaction.type.toLowerCase() != 'income';
     final amountColor = isExpense ? Colors.red.shade400 : Colors.green.shade600;
     final prefix = isExpense ? '-' : '+';
 
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
+    return Dismissible(
+      key: Key(docId),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (_) async {
+        _confirmDelete(context);
+        return false;
+      },
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 24),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 28),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFF00BFA6).withOpacity(0.1),
-                shape: BoxShape.circle,
+      child: Card(
+        elevation: 0,
+        margin: const EdgeInsets.only(bottom: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade200),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5E6FF),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  _categoryIcon(transaction.category),
+                  color: Colors.deepPurple,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                _categoryIcon(transaction.category),
-                color: const Color(0xFF00BFA6),
-                size: 24,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.description,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${transaction.category} · ${DateFormat('MMM d').format(transaction.createdAt)}",
+                      style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    transaction.description,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    transaction.category,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 13,
-                    ),
+                    "$prefix\$${transaction.amount.toStringAsFixed(2)}",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: amountColor),
                   ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  "$prefix\$${transaction.amount.toStringAsFixed(2)}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: amountColor,
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => _confirmDelete(context),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
                   ),
+                  child: Icon(Icons.delete_outline, color: Colors.grey[600], size: 20),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  DateFormat('MMM d').format(transaction.createdAt),
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
