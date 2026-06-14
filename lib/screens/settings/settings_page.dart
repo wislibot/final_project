@@ -29,38 +29,43 @@ class SettingsPage extends StatelessWidget {
 
               SectionCard(
                 child: Column(
-                  children: const [
+                  children: [
                     PreferenceTile(
                       icon: Icons.person,
                       title: "Profile",
+                      onTap: () => _showComingSoon(context, "Profile"),
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     PreferenceTile(
                       icon: Icons.palette,
                       title: "Appearance",
+                      onTap: () => _showComingSoon(context, "Appearance"),
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     PreferenceTile(
                       icon: Icons.language,
                       title: "Language",
+                      onTap: () => _showComingSoon(context, "Language"),
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     PreferenceTile(
                       icon: Icons.security,
                       title: "Privacy",
+                      onTap: () => _showComingSoon(context, "Privacy"),
                     ),
 
-                    Divider(),
+                    const Divider(),
 
                     PreferenceTile(
                       icon: Icons.help_outline,
                       title: "Help",
+                      onTap: () => _showComingSoon(context, "Help"),
                     ),
                   ],
                 ),
@@ -68,6 +73,17 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature settings coming soon'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF00BFA6),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

@@ -49,6 +49,7 @@ class _AIChatPageState extends State<AIChatPage> {
     MessageModel(
       text: "Welcome! How can I help you manage your finances today?",
       isUser: false,
+      timestamp: DateTime.now(),
     ),
   ];
   Future<void> sendMessage() async {
@@ -61,6 +62,7 @@ class _AIChatPageState extends State<AIChatPage> {
         MessageModel(
           text: text,
           isUser: true,
+          timestamp: DateTime.now(),
         ),
       );
 
@@ -119,6 +121,7 @@ class _AIChatPageState extends State<AIChatPage> {
               MessageModel(
                 text: reply,
                 isUser: false,
+                timestamp: DateTime.now(),
               ),
             );
           });
@@ -131,6 +134,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: "Sorry, I couldn't connect to Gemini.\n$e",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
       });
@@ -180,6 +184,7 @@ class _AIChatPageState extends State<AIChatPage> {
             text:
                 "Recorded ${transaction.category} expense of \$${transaction.amount}.",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
       });
@@ -192,6 +197,7 @@ class _AIChatPageState extends State<AIChatPage> {
             text:
                 "Failed to record expense.\n$e",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
       });
@@ -210,6 +216,7 @@ class _AIChatPageState extends State<AIChatPage> {
             MessageModel(
               text: "Receipt image selected. Reading receipt...",
               isUser: true,
+              timestamp: DateTime.now(),
             ),
           );
           isLoading = true;
@@ -243,6 +250,7 @@ class _AIChatPageState extends State<AIChatPage> {
               text:
                   "Receipt recorded: ${transaction.description}, ${transaction.category}, \$${transaction.amount}.",
               isUser: false,
+              timestamp: DateTime.now(),
             ),
           );
         });
@@ -252,6 +260,7 @@ class _AIChatPageState extends State<AIChatPage> {
             MessageModel(
               text: "Failed to read receipt.\n$e",
               isUser: false,
+              timestamp: DateTime.now(),
             ),
           );
         });
@@ -319,6 +328,7 @@ class _AIChatPageState extends State<AIChatPage> {
               text:
                   "Reminder '${reminder.title}' saved.",
               isUser: false,
+              timestamp: DateTime.now(),
             ),
           );
         });
@@ -331,6 +341,7 @@ class _AIChatPageState extends State<AIChatPage> {
               text:
                   "Failed to save reminder.",
               isUser: false,
+              timestamp: DateTime.now(),
             ),
           );
         });
@@ -382,6 +393,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: reply,
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
 
@@ -395,6 +407,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: "Failed to analyze spending.",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
 
@@ -449,6 +462,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: reply,
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
 
@@ -463,6 +477,7 @@ class _AIChatPageState extends State<AIChatPage> {
             text:
                 "Failed to create budget plan.",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
 
@@ -487,6 +502,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: reply,
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
       });
@@ -496,6 +512,7 @@ class _AIChatPageState extends State<AIChatPage> {
           MessageModel(
             text: "Failed to generate weekly coaching insight.",
             isUser: false,
+            timestamp: DateTime.now(),
           ),
         );
       });
@@ -528,9 +545,10 @@ class _AIChatPageState extends State<AIChatPage> {
                           (context, index) {
 
                         if (index == messages.length) {
-                          return const ChatBubble(
+                          return ChatBubble(
                             message: "Thinking...",
                             isUser: false,
+                            timestamp: DateTime.now(),
                           );
                         }
 
@@ -539,6 +557,7 @@ class _AIChatPageState extends State<AIChatPage> {
                         return ChatBubble(
                           message: message.text,
                           isUser: message.isUser,
+                          timestamp: message.timestamp,
                         );
                       },
                     ),
@@ -550,27 +569,31 @@ class _AIChatPageState extends State<AIChatPage> {
                     scrollDirection: Axis.horizontal,
 
                     child: Row(
-                      children: const [
+                      children: [
                         QuickActionChip(
                           text: "✨ Record lunch \$15",
+                          onTap: () => messageController.text = "Record lunch \$15",
                         ),
 
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
 
                         QuickActionChip(
                           text: "📈 Analyze spending",
+                          onTap: () => messageController.text = "Analyze spending",
                         ),
 
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
 
                         QuickActionChip(
                           text: "💰 Set budget",
+                          onTap: () => messageController.text = "Set budget",
                         ),
 
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
 
                         QuickActionChip(
                           text: "🔔 Set reminder",
+                          onTap: () => messageController.text = "Set reminder",
                         ),
 
                       ],

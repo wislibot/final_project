@@ -53,39 +53,70 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.bar_chart,
-                    color: currentIndex == 0
-                        ? const Color(0xFF00BFA6)
-                        : Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      currentIndex = 0;
-                    });
-                  },
+                _NavItem(
+                  icon: Icons.bar_chart_rounded,
+                  label: 'Analytics',
+                  isActive: currentIndex == 0,
+                  onTap: () => setState(() => currentIndex = 0),
                 ),
 
                 const SizedBox(width: 60),
 
-                IconButton(
-                  icon: Icon(
-                    Icons.settings,
-                    color: currentIndex == 2
-                        ? const Color(0xFF00BFA6)
-                        : Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      currentIndex = 2;
-                    });
-                  },
+                _NavItem(
+                  icon: Icons.settings_rounded,
+                  label: 'Settings',
+                  isActive: currentIndex == 2,
+                  onTap: () => setState(() => currentIndex = 2),
                 ),
               ],
             ),
           ),
         ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? const Color(0xFF00BFA6) : Colors.grey,
+              size: 28,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isActive ? const Color(0xFF00BFA6) : Colors.grey,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
