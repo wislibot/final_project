@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../repositories/transaction_repository.dart';
 import '../../models/transaction_model.dart';
+import '../../core/localization/app_localizations.dart';
 
 class TransactionHistoryPage extends StatelessWidget {
   const TransactionHistoryPage({super.key});
@@ -11,10 +12,11 @@ class TransactionHistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final repository = TransactionRepository();
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Transaction History"),
+        title: Text(loc.transactionHistory),
         backgroundColor: const Color(0xFF00BFA6),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -38,12 +40,12 @@ class TransactionHistoryPage extends StatelessWidget {
                   Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey[300]),
                   const SizedBox(height: 16),
                   Text(
-                    "No transactions yet",
+                    loc.noTransactionsYet,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Start by recording your first expense",
+                    loc.startRecording,
                     style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                   ),
                 ],
@@ -55,14 +57,14 @@ class TransactionHistoryPage extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             itemCount: docs.length,
             itemBuilder: (context, index) {
-              final doc = docs[index];
               final transaction = TransactionModel.fromMap(
-                doc.data() as Map<String, dynamic>,
+                docs[index].data() as Map<String, dynamic>,
+                docId: docs[index].id,
               );
 
               return _TransactionTile(
                 transaction: transaction,
-                docId: doc.id,
+                docId: docs[index].id,
                 repository: repository,
               );
             },

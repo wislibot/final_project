@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../repositories/auth_repository.dart';
+import '../../core/localization/app_localizations.dart';
 import 'signup_page.dart';
 import '../home/home_page.dart';
 
@@ -66,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -112,9 +114,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'FinWise',
-                    style: TextStyle(
+                  Text(
+                    loc.appName,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -123,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Smart finance, simplified',
+                    loc.smartFinance,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.85),
                       fontSize: 15,
@@ -139,9 +141,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Welcome back',
-                    style: TextStyle(
+                  Text(
+                    loc.welcomeBack,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1A1A2E),
@@ -162,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: loc.email,
                       hintText: 'you@example.com',
                       prefixIcon: const Icon(Icons.email_outlined,
                           color: Color(0xFF00BFA6)),
@@ -193,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: loc.password,
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline_rounded,
                           color: Color(0xFF00BFA6)),
@@ -244,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )
                           : const Text(
-                              'Sign In',
+                              loc.signIn,
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
@@ -260,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        loc.dontHaveAccount,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 14,
@@ -275,7 +277,7 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                         child: const Text(
-                          'Sign Up',
+                          loc.signUp,
                           style: TextStyle(
                             color: Color(0xFF00BFA6),
                             fontSize: 14,
