@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../repositories/auth_repository.dart';
+import '../../core/localization/app_localizations.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -44,10 +45,10 @@ class _SignupPageState extends State<SignupPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created! You can now sign in.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).createAccount),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: Color(0xFF00BFA6),
+          backgroundColor: const Color(0xFF00BFA6),
         ),
       );
 
@@ -80,6 +81,8 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -92,10 +95,7 @@ class _SignupPageState extends State<SignupPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF00BFA6),
-                    Color(0xFF00897B),
-                  ],
+                  colors: [Color(0xFF00BFA6), Color(0xFF00897B)],
                 ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(36),
@@ -125,9 +125,9 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Join FinWise',
-                    style: TextStyle(
+                  Text(
+                    loc.joinFinwise,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -136,7 +136,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Create your account',
+                    loc.createYourAccount,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.85),
                       fontSize: 15,
@@ -157,27 +157,15 @@ class _SignupPageState extends State<SignupPage> {
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'you@example.com',
-                      prefixIcon: const Icon(Icons.email_outlined,
-                          color: Color(0xFF00BFA6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF00BFA6), width: 2),
-                      ),
+                      labelText: loc.email,
+                      hintText: loc.emailHint,
+                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF00BFA6)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF00BFA6), width: 2)),
                       filled: true,
                       fillColor: Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
 
@@ -188,27 +176,15 @@ class _SignupPageState extends State<SignupPage> {
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'At least 6 characters',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded,
-                          color: Color(0xFF00BFA6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF00BFA6), width: 2),
-                      ),
+                      labelText: loc.password,
+                      hintText: loc.passwordHint,
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF00BFA6)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF00BFA6), width: 2)),
                       filled: true,
                       fillColor: Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
 
@@ -219,27 +195,15 @@ class _SignupPageState extends State<SignupPage> {
                     controller: confirmController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      hintText: 'Re-enter password',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded,
-                          color: Color(0xFF00BFA6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF00BFA6), width: 2),
-                      ),
+                      labelText: loc.confirmPassword,
+                      hintText: loc.confirmPasswordHint,
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF00BFA6)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF00BFA6), width: 2)),
                       filled: true,
                       fillColor: Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
 
@@ -253,29 +217,13 @@ class _SignupPageState extends State<SignupPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00BFA6),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 2,
-                        disabledBackgroundColor: const Color(0xFF00BFA6)
-                            .withOpacity(0.6),
+                        disabledBackgroundColor: const Color(0xFF00BFA6).withOpacity(0.6),
                       ),
                       child: isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Create Account',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+                          : Text(loc.createAccount, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                     ),
                   ),
 
@@ -285,23 +233,10 @@ class _SignupPageState extends State<SignupPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Already have an account? ',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
+                      Text(loc.alreadyHaveAccount, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            color: Color(0xFF00BFA6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: Text(loc.signIn, style: const TextStyle(color: Color(0xFF00BFA6), fontSize: 14, fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),
