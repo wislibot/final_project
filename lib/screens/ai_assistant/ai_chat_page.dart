@@ -14,6 +14,7 @@ import '../../core/services/image_service.dart';
 import '../../core/services/speech_service.dart';
 
 import '../../repositories/budget_repository.dart';
+import '../../models/budget_model.dart';
 
 import '../../models/reminder_model.dart';
 import '../../repositories/reminder_repository.dart';
@@ -72,50 +73,37 @@ class _AIChatPageState extends State<AIChatPage> {
     messageController.clear();
 
     try {
-      final intent =
-          await geminiService.detectIntent(text);
+      final rawIntent = await geminiService.detectIntent(text);
+      // Normalize: trim, lowercase, take first word only
+      final intent = rawIntent.trim().toLowerCase().split(RegExp(r'\s+')).first;
 
       switch (intent) {
-
         case "expense":
+          await recordExpense(text);
+          break;
 
-        await recordExpense(text);
+        case "budget":
+          await recordBudget(text);
+          break;
 
-        break;
+        case "reminder":
+          await recordReminder(text);
+          break;
 
-      case "budget":
+        case "analysis":
+          await analyzeMonthlySpending();
+          break;
 
-        await recordBudget(text);
+        case "planner":
+          await createBudgetPlan(text);
+          break;
 
-        break;
-
-      case "reminder":
-
-        await recordReminder(text);
-
-        break;
-      
-      case "analysis":
-
-        await analyzeMonthlySpending();
-
-        break;
-      
-      case "planner":
-
-      await createBudgetPlan(text);
-
-      break;
-
-      case "weekly":
-      await generateWeeklyCoach();
-      break;
+        case "weekly":
+          await generateWeeklyCoach();
+          break;
 
         default:
-
-          final reply =
-              await geminiService.sendMessage(text);
-
+          final reply = await geminiService.sendMessage(text);
           setState(() {
             messages.add(
               MessageModel(
@@ -126,7 +114,6 @@ class _AIChatPageState extends State<AIChatPage> {
             );
           });
       }
-
     } catch (e) {
 
       setState(() {
@@ -286,7 +273,53 @@ class _AIChatPageState extends State<AIChatPage> {
 
     }
     Future<void> recordBudget(String text) async {
+      try {
+        String response = await geminiService.extractBudget(text);
+        response = response
+            .replaceAll("```json", "")
+            .replaceAll("```JSON", "")
+            .replaceAll("```", "")
+            .trim();
 
+        final data = jsonDecode(response);
+        final budget = BudgetModel(
+          category: data["category"],
+          limit: double.parse(data["limit"].toString()),
+        );
+
+        await budgetRepository.addBudget(budget);
+
+        setState(() {
+          messages.add(
+            MessageModel(
+              text: "Budget set!",
+              isUser: false,
+              timestamp: DateTime.now(),
+              card: _buildInfoCard(
+                icon: Icons.account_balance_wallet_rounded,
+                iconColor: const Color(0xFF1976D2),
+                bgColor: const Color(0xFFE3F2FD),
+                borderColor: const Color(0xFF90CAF9),
+                title: "Budget Recorded",
+                fields: {
+                  "Category": budget.category,
+                  "Limit": "\$${budget.limit.toStringAsFixed(2)}",
+                },
+              ),
+            ),
+          );
+        });
+      } catch (e) {
+        setState(() {
+          messages.add(
+            MessageModel(
+              text: "Failed to set budget. Please try again.\n$e",
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        });
+      }
     }
     Future<void> recordReminder(String text) async {
 
@@ -595,6 +628,60 @@ class _AIChatPageState extends State<AIChatPage> {
         ],
       ),
     ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+    required Color borderColor,
+    required String title,
+    required Map<String, String> fields,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  color: iconColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...fields.entries.map((entry) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  entry.key,
+                  style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                ),
+                Text(
+                  entry.value,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
     );
   }
 }
