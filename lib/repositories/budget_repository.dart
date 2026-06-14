@@ -24,4 +24,11 @@ class BudgetRepository {
         .snapshots();
 
   }
+
+  Future<List<BudgetModel>> fetchBudgets() async {
+    final snapshot = await firestore.collection('budgets').get();
+    return snapshot.docs
+        .map((doc) => BudgetModel.fromMap(doc.data()))
+        .toList();
+  }
 }

@@ -2,9 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/transaction_model.dart';
+import '../../models/budget_model.dart';
 import '../../repositories/transaction_repository.dart';
+import '../../repositories/budget_repository.dart';
+import '../../core/services/insights_service.dart';
 import '../../widgets/analytics/overview_card.dart';
 import '../../widgets/analytics/monthly_progress_card.dart';
+import '../../widgets/analytics/insights_section.dart';
 import '../../widgets/analytics/chart_section.dart';
 
 class AnalyticsPage extends StatelessWidget {
@@ -13,6 +17,8 @@ class AnalyticsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final repository = TransactionRepository();
+    final budgetRepository = BudgetRepository();
+    final insightsService = InsightsService();
 
     return Scaffold(
       body: SafeArea(
@@ -45,64 +51,80 @@ class AnalyticsPage extends StatelessWidget {
               }
             }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Dark navy header ──
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF0B2447), Color(0xFF19376D)],
+            return FutureBuilder<List<BudgetModel>>(
+              future: budgetRepository.fetchBudgets(),
+              builder: (context, budgetSnapshot) {
+                final budgets = budgetSnapshot.data ?? [];
+                final insights = insightsService.generateInsights(allTransactions, budgets);
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Dark navy header ──
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF0B2447), Color(0xFF19376D)],
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(28),
+                            bottomRight: Radius.circular(28),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Analytics", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            Text("Your financial insights", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
+                          ],
+                        ),
                       ),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(28),
-                        bottomRight: Radius.circular(28),
+
+                      const SizedBox(height: 20),
+
+                      // ── Overview Card ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Analytics", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 6),
-                        Text("Your financial insights", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
-                      ],
-                    ),
+
+                      const SizedBox(height: 16),
+
+                      // ── Monthly Progress Card ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: MonthlyProgressCard(totalSpent: totalSpent, budgetLimit: 1600),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // ── Insights Section ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: InsightsSection(insights: insights),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // ── Chart Section ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ChartSection(
+                          categoryTotals: categoryTotals,
+                          transactions: allTransactions,
+                        ),
+                      ),
+                    ],
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // ── Overview Card ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ── Monthly Progress Card ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: MonthlyProgressCard(totalSpent: totalSpent, budgetLimit: 1600),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ── Chart Section ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ChartSection(
-                      categoryTotals: categoryTotals,
-                      transactions: allTransactions,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             );
           },
         ),
