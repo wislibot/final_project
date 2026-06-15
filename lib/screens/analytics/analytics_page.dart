@@ -24,6 +24,14 @@ class AnalyticsPage extends StatefulWidget {
 class _AnalyticsPageState extends State<AnalyticsPage> {
   String _selectedPreset = 'This Month';
   DateTimeRange? _customRange;
+  final BudgetRepository _budgetRepository = BudgetRepository();
+
+  /// Fetch budgets for current month; fall back to all budgets if none found.
+  Future<List<BudgetModel>> _fetchBudgetsWithFallback(int month, int year) async {
+    final monthly = await _budgetRepository.fetchBudgetsForMonth(month, year);
+    if (monthly.isNotEmpty) return monthly;
+    return _budgetRepository.fetchBudgets();
+  }
 
   DateTimeRange _getSelectedRange() {
     final now = DateTime.now();
@@ -64,7 +72,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   @override
   Widget build(BuildContext context) {
     final repository = TransactionRepository();
-    final budgetRepository = BudgetRepository();
     final insightsService = InsightsService();
     final range = _getSelectedRange();
 
@@ -104,11 +111,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             }
 
             return FutureBuilder<List<BudgetModel>>(
-              future: budgetRepository.fetchBudgetsForMonth(now.month, now.year),
+              future: _fetchBudgetsWithFallback(now.month, now.year),
               builder: (context, budgetSnapshot) {
                 final budgets = budgetSnapshot.data ?? [];
-                final totalBudget = budgets.fold<double>(0, (sum, b) => sum + b.limit);
-                final budgetLimit = totalBudget > 0 ? totalBudget : 1600.0;
+                final budgetLimit = budgets.fold<double>(0, (sum, b) => sum + b.limit);
 
                 final pacingService = BudgetPacingService();
                 final pacingData = pacingService.computePacing(
