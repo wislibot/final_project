@@ -138,14 +138,18 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                             bottomRight: Radius.circular(28),
                           ),
                         ),
-                        final loc = AppLocalizations.of(context);
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
-                          ],
+                        child: Builder(
+                          builder: (context) {
+                            final loc = AppLocalizations.of(context);
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 6),
+                                Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
+                              ],
+                            );
+                          },
                         ),
                       ),
 

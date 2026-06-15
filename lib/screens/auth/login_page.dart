@@ -245,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
+                          : Text(
                               loc.signIn,
                               style: TextStyle(
                                 fontSize: 17,
@@ -276,7 +276,7 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (_) => const SignupPage()),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           loc.signUp,
                           style: TextStyle(
                             color: Color(0xFF00BFA6),
