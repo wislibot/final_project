@@ -21,7 +21,6 @@ import '../../models/reminder_model.dart';
 import '../../repositories/reminder_repository.dart';
 import '../../widgets/chat/chat_header.dart';
 import '../../core/services/habit_analyzer_service.dart';
-import '../../core/services/weekly_report_service.dart';
 import '../../core/services/date_override_service.dart';
 import '../../core/services/spending_analyzer_service.dart';
 import '../../models/weekly_snapshot_model.dart';
@@ -663,8 +662,8 @@ class _AIChatPageState extends State<AIChatPage> {
         }
       }
 
-      final context = buffer.toString();
-      final reply = await geminiService.weeklyReflection(context);
+      final contextStr = buffer.toString();
+      final reply = await geminiService.weeklyReflection(contextStr);
 
       setState(() {
         messages.add(MessageModel(

@@ -112,8 +112,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
                 final pacingService = BudgetPacingService();
                 final pacingData = pacingService.computePacing(
-                  budgets: budgets,
-                  transactions: allTransactions.where((t) => t.type != 'income').toList(),
+                  budgets,
+                  allTransactions.where((t) => t.type != 'income').toList(),
                 );
 
                 final insights = insightsService.generateInsights(allTransactions, budgets, pacingData: pacingData);

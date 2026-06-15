@@ -72,7 +72,6 @@ class BudgetAllocationService {
     'shopping': 'Shopping',
     'clothes': 'Shopping',
     'clothing': 'Shopping',
-    'clothes': 'Shopping',
     'electronics': 'Shopping',
     'amazon': 'Shopping',
     'store': 'Shopping',
