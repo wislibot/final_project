@@ -207,8 +207,9 @@ class ExpenseRecordedCard extends StatelessWidget {
 class BudgetAllocationCard extends StatelessWidget {
   final String totalBudget;
   final List<Map<String, dynamic>> allocations;
-  final VoidCallback onConfirm;
-  final VoidCallback onEdit;
+  final VoidCallback? onConfirm;
+  final VoidCallback? onEdit;
+  final bool isConfirmed;
 
   static const Map<String, Color> _categoryColors = {
     'Food': Color(0xFF00BFA6),
@@ -224,8 +225,9 @@ class BudgetAllocationCard extends StatelessWidget {
     super.key,
     required this.totalBudget,
     required this.allocations,
-    required this.onConfirm,
-    required this.onEdit,
+    this.onConfirm,
+    this.onEdit,
+    this.isConfirmed = false,
   });
 
   @override
@@ -262,7 +264,7 @@ class BudgetAllocationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Suggested Allocation",
+                      isConfirmed ? "Confirmed Allocation" : "Suggested Allocation",
                       style: TextStyle(
                         color: Colors.green.shade700,
                         fontWeight: FontWeight.w600,
@@ -321,45 +323,47 @@ class BudgetAllocationCard extends StatelessWidget {
               ),
             );
           }),
-          const Divider(height: 16),
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onEdit,
-                  icon: Icon(Icons.edit_rounded, size: 16, color: Colors.grey[700]),
-                  label: Text(
-                    "Edit",
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[300]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+          if (!isConfirmed) ...[
+            const Divider(height: 16),
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onEdit,
+                    icon: Icon(Icons.edit_rounded, size: 16, color: Colors.grey[700]),
+                    label: Text(
+                      "Edit",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.grey[300]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onConfirm,
-                  icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-                  label: const Text(
-                    "Confirm",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00BFA6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onConfirm,
+                    icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+                    label: const Text(
+                      "Confirm",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00BFA6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );

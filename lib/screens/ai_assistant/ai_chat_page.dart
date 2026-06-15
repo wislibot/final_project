@@ -364,17 +364,45 @@ class _AIChatPageState extends State<AIChatPage> {
 
         await budgetRepository.saveMonthlyBudgets(budgetsWithMonth);
 
+        // Build the allocations data for the confirmed card
+        final allocationsData = allocations.map((b) {
+          return {
+            'category': b.category,
+            'amount': b.limit,
+            'percent': totalAmount > 0
+                ? (b.limit / totalAmount * 100)
+                : 0.0,
+          };
+        }).toList();
+
+        // Find the message with the BudgetAllocationCard and replace it
         setState(() {
+          final cardIndex = messages.lastIndexWhere((m) => m.card is BudgetAllocationCard);
+          if (cardIndex != -1) {
+            final old = messages[cardIndex];
+            messages[cardIndex] = MessageModel(
+              text: old.text,
+              isUser: old.isUser,
+              timestamp: old.timestamp,
+              card: BudgetAllocationCard(
+                totalBudget: totalAmount.toStringAsFixed(0),
+                allocations: allocationsData,
+                isConfirmed: true,
+              ),
+            );
+          }
+
+          // Add the success message
           messages.add(MessageModel(
             text: "Budget set! Your \$${totalAmount.toStringAsFixed(0)}/month allocation has been saved.",
             isUser: false,
             timestamp: DateTime.now(),
             card: _buildInfoCard(
-              icon: Icons.account_balance_wallet_rounded,
-              iconColor: const Color(0xFF1976D2),
-              bgColor: const Color(0xFFE3F2FD),
-              borderColor: const Color(0xFF90CAF9),
-              title: "Budget Recorded",
+              icon: Icons.check_circle_rounded,
+              iconColor: const Color(0xFF2E7D32),
+              bgColor: const Color(0xFFE8F5E9),
+              borderColor: const Color(0xFFA5D6A7),
+              title: "Budget Confirmed",
               fields: {
                 "Total": "\$${totalAmount.toStringAsFixed(2)}",
                 "Categories": "${allocations.length} categories",
