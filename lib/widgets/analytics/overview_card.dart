@@ -72,11 +72,13 @@ class OverviewCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _StatBox(
-                  label: "Budget Limit",
-                  value: "\$${budgetLimit.toStringAsFixed(2)}",
-                  bgColor: const Color(0xFFE8F5E9),
-                ),
+                child: budgetLimit > 0
+                    ? _StatBox(
+                        label: "Budget Limit",
+                        value: "\$${budgetLimit.toStringAsFixed(2)}",
+                        bgColor: const Color(0xFFE8F5E9),
+                      )
+                    : _SetBudgetPrompt(),
               ),
             ],
           ),
@@ -151,6 +153,66 @@ class _StatBox extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SetBudgetPrompt extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to AI Chat tab (index 1 in the bottom nav)
+        // Find the nearest HomePage state and switch tab
+        // Since we can't easily do that, we'll just show a snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Go to AI Assistant and say "Set budget \$2000"'),
+            action: SnackBarAction(
+              label: 'OK',
+              onPressed: () {},
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFF00BFA6).withOpacity(0.3), width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Budget Limit",
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(Icons.add_circle_outline_rounded, size: 18, color: const Color(0xFF00BFA6)),
+                const SizedBox(width: 6),
+                Text(
+                  "Set a budget",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF00BFA6),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
