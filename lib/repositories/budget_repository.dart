@@ -61,6 +61,18 @@ class BudgetRepository {
         .snapshots();
   }
 
+  /// Stream budgets for a specific month
+  Stream<List<BudgetModel>> streamBudgetsForMonth(int month, int year) {
+    return firestore
+        .collection('budgets')
+        .where('month', isEqualTo: month)
+        .where('year', isEqualTo: year)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => BudgetModel.fromMap(doc.data()))
+            .toList());
+  }
+
   /// Delete all budgets for a specific month
   Future<int> deleteBudgetsForMonth(int month, int year) async {
     final snapshot = await firestore

@@ -25,46 +25,38 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   String _selectedPreset = 'This Month';
   DateTimeRange? _customRange;
   final BudgetRepository _budgetRepository = BudgetRepository();
-
-  /// Fetch budgets for current month; fall back to all budgets if none found.
-  Future<List<BudgetModel>> _fetchBudgetsWithFallback(int month, int year) async {
-    final monthly = await _budgetRepository.fetchBudgetsForMonth(month, year);
-    if (monthly.isNotEmpty) return monthly;
-    return _budgetRepository.fetchBudgets();
-  }
+  final DateTime _now = DateTime.now();
 
   DateTimeRange _getSelectedRange() {
-    final now = DateTime.now();
-
     switch (_selectedPreset) {
       case 'This Week':
-        final daysFromMonday = now.weekday - 1;
-        final start = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysFromMonday));
-        return DateTimeRange(start: start, end: now);
+        final daysFromMonday = _now.weekday - 1;
+        final start = DateTime(_now.year, _now.month, _now.day).subtract(Duration(days: daysFromMonday));
+        return DateTimeRange(start: start, end: _now);
 
       case 'This Month':
         return DateTimeRange(
-          start: DateTime(now.year, now.month, 1),
-          end: now,
+          start: DateTime(_now.year, _now.month, 1),
+          end: _now,
         );
 
       case 'This Year':
         return DateTimeRange(
-          start: DateTime(now.year, 1, 1),
-          end: now,
+          start: DateTime(_now.year, 1, 1),
+          end: _now,
         );
 
       case 'Custom':
         return _customRange ?? DateTimeRange(
-          start: DateTime(now.year, now.month, 1),
-          end: now,
+          start: DateTime(_now.year, _now.month, 1),
+          end: _now,
         );
 
       case 'All Time':
       default:
         return DateTimeRange(
           start: DateTime(2020),
-          end: now,
+          end: _now,
         );
     }
   }
@@ -84,7 +76,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             final List<TransactionModel> allTransactions = [];
             double totalSpent = 0;
             double todaySpent = 0;
-            final now = DateTime.now();
 
             if (snapshot.hasData) {
               for (final doc in snapshot.data!.docs) {
@@ -100,9 +91,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
                   if (transaction.type != "income") {
                     totalSpent += transaction.amount;
-                    if (transaction.createdAt.year == now.year &&
-                        transaction.createdAt.month == now.month &&
-                        transaction.createdAt.day == now.day) {
+                    if (transaction.createdAt.year == _now.year &&
+                        transaction.createdAt.month == _now.month &&
+                        transaction.createdAt.day == _now.day) {
                       todaySpent += transaction.amount;
                     }
                   }
@@ -110,113 +101,138 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               }
             }
 
-            return FutureBuilder<List<BudgetModel>>(
-              future: _fetchBudgetsWithFallback(now.month, now.year),
+            // StreamBuilder for budgets — reacts to Firestore changes in real-time
+            return StreamBuilder<List<BudgetModel>>(
+              stream: _budgetRepository.streamBudgetsForMonth(_now.month, _now.year),
               builder: (context, budgetSnapshot) {
-                final budgets = budgetSnapshot.data ?? [];
-                final budgetLimit = budgets.fold<double>(0, (sum, b) => sum + b.limit);
+                final monthlyBudgets = budgetSnapshot.data ?? [];
 
-                final pacingService = BudgetPacingService();
-                final pacingData = pacingService.computePacing(
-                  budgets,
-                  allTransactions.where((t) => t.type != 'income').toList(),
-                );
+                // If no budgets for this month, fall back to all budgets (legacy data)
+                if (monthlyBudgets.isEmpty) {
+                  return FutureBuilder<List<BudgetModel>>(
+                    future: _budgetRepository.fetchBudgets(),
+                    builder: (context, allBudgetSnapshot) {
+                      final allBudgets = allBudgetSnapshot.data ?? [];
+                      return _buildContent(context, allBudgets, allTransactions, categoryTotals, totalSpent, todaySpent, insightsService);
+                    },
+                  );
+                }
 
-                final insights = insightsService.generateInsights(allTransactions, budgets, pacingData: pacingData);
-
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ── Dark navy header ──
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF0B2447), Color(0xFF19376D)],
-                          ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(28),
-                            bottomRight: Radius.circular(28),
-                          ),
-                        ),
-                        child: Builder(
-                          builder: (context) {
-                            final loc = AppLocalizations.of(context);
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 6),
-                                Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // ── Overview Card ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent, budgetLimit: budgetLimit),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // ── Monthly Progress Card ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: MonthlyProgressCard(totalSpent: totalSpent, budgetLimit: budgetLimit),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // ── Insights Section ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: InsightsSection(insights: insights),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // ── Date Range Filter ──
-                      DateRangeSelector(
-                        selected: _selectedPreset,
-                        customRange: _customRange,
-                        onPresetSelected: (preset) => setState(() {
-                          _selectedPreset = preset;
-                          if (preset != 'Custom') _customRange = null;
-                        }),
-                        onCustomRangeSelected: (range) => setState(() {
-                          _selectedPreset = 'Custom';
-                          _customRange = range;
-                        }),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // ── Chart Section ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ChartSection(
-                          categoryTotals: categoryTotals,
-                          transactions: allTransactions,
-                          pacingData: pacingData,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                return _buildContent(context, monthlyBudgets, allTransactions, categoryTotals, totalSpent, todaySpent, insightsService);
               },
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    List<BudgetModel> budgets,
+    List<TransactionModel> allTransactions,
+    Map<String, double> categoryTotals,
+    double totalSpent,
+    double todaySpent,
+    InsightsService insightsService,
+  ) {
+    final budgetLimit = budgets.fold<double>(0, (sum, b) => sum + b.limit);
+
+    final pacingService = BudgetPacingService();
+    final pacingData = pacingService.computePacing(
+      budgets,
+      allTransactions.where((t) => t.type != 'income').toList(),
+    );
+
+    final insights = insightsService.generateInsights(allTransactions, budgets, pacingData: pacingData);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Dark navy header ──
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF0B2447), Color(0xFF19376D)],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
+              ),
+            ),
+            child: Builder(
+              builder: (context) {
+                final loc = AppLocalizations.of(context);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
+                  ],
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Overview Card ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent, budgetLimit: budgetLimit),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ── Monthly Progress Card ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: MonthlyProgressCard(totalSpent: totalSpent, budgetLimit: budgetLimit),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ── Insights Section ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: InsightsSection(insights: insights),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Date Range Filter ──
+          DateRangeSelector(
+            selected: _selectedPreset,
+            customRange: _customRange,
+            onPresetSelected: (preset) => setState(() {
+              _selectedPreset = preset;
+              if (preset != 'Custom') _customRange = null;
+            }),
+            onCustomRangeSelected: (range) => setState(() {
+              _selectedPreset = 'Custom';
+              _customRange = range;
+            }),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Chart Section ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ChartSection(
+              categoryTotals: categoryTotals,
+              transactions: allTransactions,
+              pacingData: pacingData,
+            ),
+          ),
+        ],
       ),
     );
   }
