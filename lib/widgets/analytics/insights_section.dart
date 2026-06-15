@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/insight_model.dart';
 
+import '../../core/localization/app_localizations.dart';
+
 class InsightsSection extends StatelessWidget {
   final List<InsightModel> insights;
 
@@ -8,6 +10,7 @@ class InsightsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (insights.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -26,8 +29,8 @@ class InsightsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Insights",
+          Text(
+            loc.insights,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

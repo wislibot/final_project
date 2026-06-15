@@ -25,6 +25,7 @@ import '../../core/services/date_override_service.dart';
 import '../../core/services/spending_analyzer_service.dart';
 import '../../models/weekly_snapshot_model.dart';
 import '../../repositories/weekly_snapshot_repository.dart';
+import '../../core/localization/app_localizations.dart';
 
 
 class AIChatPage extends StatefulWidget {
@@ -50,13 +51,24 @@ class _AIChatPageState extends State<AIChatPage> {
 
   bool isLoading = false;
 
-  final List<MessageModel> messages = [
-    MessageModel(
-      text: "Welcome! How can I help you manage your finances today?",
-      isUser: false,
-      timestamp: DateTime.now(),
-    ),
-  ];
+  final List<MessageModel> messages = [];
+
+  bool _welcomeAdded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_welcomeAdded) {
+      _welcomeAdded = true;
+      final loc = AppLocalizations.of(context);
+      messages.add(MessageModel(
+        text: loc.welcomeMessage,
+        isUser: false,
+        timestamp: DateTime.now(),
+      ));
+    }
+  }
+
   Future<void> sendMessage() async {
     final text = messageController.text.trim();
 
@@ -145,6 +157,7 @@ class _AIChatPageState extends State<AIChatPage> {
  
   Future<void> recordExpense(String text) async {
     try {
+      final loc = AppLocalizations.of(context);
       String response = await geminiService.extractExpense(text);
       response = response
           .replaceAll("```json", "")
@@ -166,7 +179,7 @@ class _AIChatPageState extends State<AIChatPage> {
       setState(() {
         messages.add(
           MessageModel(
-            text: "I've recorded your expense!",
+            text: loc.recordingExpense,
             isUser: false,
             timestamp: DateTime.now(),
             card: ExpenseRecordedCard(
@@ -182,7 +195,7 @@ class _AIChatPageState extends State<AIChatPage> {
       setState(() {
         messages.add(
           MessageModel(
-            text: "Failed to record expense.\n$e",
+            text: "${loc.failedRecordExpense}\n$e",
             isUser: false,
             timestamp: DateTime.now(),
           ),
@@ -193,6 +206,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
   Future<void> processReceipt() async {
       try {
+        final loc = AppLocalizations.of(context);
         final image = await imageService.pickImage();
 
         if (image == null) return;
@@ -244,7 +258,7 @@ class _AIChatPageState extends State<AIChatPage> {
         setState(() {
           messages.add(
             MessageModel(
-              text: "Failed to read receipt.\n$e",
+              text: "${loc.failedReadReceipt}\n$e",
               isUser: false,
               timestamp: DateTime.now(),
             ),
@@ -277,6 +291,7 @@ class _AIChatPageState extends State<AIChatPage> {
     }
     Future<void> setMonthlyBudget(String text) async {
       try {
+        final loc = AppLocalizations.of(context);
         // 1. Extract total amount via Gemini
         String response = await geminiService.extractBudgetAmount(text);
         response = response
@@ -326,7 +341,7 @@ class _AIChatPageState extends State<AIChatPage> {
         // 5. Show confirmation card
         setState(() {
           messages.add(MessageModel(
-            text: "Here's a suggested budget breakdown for \$${totalAmount.toStringAsFixed(0)}/month. You can confirm or edit:",
+            text: loc.suggestBreakdown,
             isUser: false,
             timestamp: DateTime.now(),
             card: BudgetAllocationCard(
@@ -336,7 +351,7 @@ class _AIChatPageState extends State<AIChatPage> {
               onEdit: () {
                 setState(() {
                   messages.add(MessageModel(
-                    text: "You can say things like 'Set food budget to \$300' to adjust individual categories.",
+                    text: loc.adjustHint,
                     isUser: false,
                     timestamp: DateTime.now(),
                   ));
@@ -348,7 +363,7 @@ class _AIChatPageState extends State<AIChatPage> {
       } catch (e) {
         setState(() {
           messages.add(MessageModel(
-            text: "Failed to set budget. Please try again.\n$e",
+            text: "${loc.failedSetBudget}\n$e",
             isUser: false,
             timestamp: DateTime.now(),
           ));
@@ -358,6 +373,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
     void _confirmBudget(List<BudgetModel> allocations, double totalAmount) async {
       try {
+        final loc = AppLocalizations.of(context);
         final now = DateTime.now();
         final budgetsWithMonth = allocations.map((b) => BudgetModel(
           category: b.category,
@@ -398,7 +414,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
           // Add the success message
           messages.add(MessageModel(
-            text: "Budget set! Your \$${totalAmount.toStringAsFixed(0)}/month allocation has been saved.",
+            text: loc.budgetSavedMsg,
             isUser: false,
             timestamp: DateTime.now(),
             card: _buildInfoCard(
@@ -406,7 +422,7 @@ class _AIChatPageState extends State<AIChatPage> {
               iconColor: const Color(0xFF2E7D32),
               bgColor: const Color(0xFFE8F5E9),
               borderColor: const Color(0xFFA5D6A7),
-              title: "Budget Confirmed",
+              title: loc.budgetConfirmed,
               fields: {
                 "Total": "\$${totalAmount.toStringAsFixed(2)}",
                 "Categories": "${allocations.length} categories",
@@ -418,7 +434,7 @@ class _AIChatPageState extends State<AIChatPage> {
       } catch (e) {
         setState(() {
           messages.add(MessageModel(
-            text: "Failed to save budget.\n$e",
+            text: "${loc.failedSaveBudget}\n$e",
             isUser: false,
             timestamp: DateTime.now(),
           ));
@@ -428,6 +444,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
     Future<void> resetBudget() async {
       try {
+        final loc = AppLocalizations.of(context);
         final now = DateTime.now();
         final deleted = await budgetRepository.deleteBudgetsForMonth(now.month, now.year);
 
@@ -442,7 +459,7 @@ class _AIChatPageState extends State<AIChatPage> {
                 iconColor: const Color(0xFFE53935),
                 bgColor: const Color(0xFFFFEBEE),
                 borderColor: const Color(0xFFEF9A9A),
-                title: "Budget Reset",
+                title: loc.budgetResetLabel,
                 fields: {
                   "Month": "${now.month}/${now.year}",
                   "Deleted": "$deleted categories",
@@ -453,7 +470,7 @@ class _AIChatPageState extends State<AIChatPage> {
         } else {
           setState(() {
             messages.add(MessageModel(
-              text: "No budget found for this month. Say \"Set budget \$2000\" to create one.",
+              text: loc.noBudgetFound,
               isUser: false,
               timestamp: DateTime.now(),
             ));
@@ -462,7 +479,7 @@ class _AIChatPageState extends State<AIChatPage> {
       } catch (e) {
         setState(() {
           messages.add(MessageModel(
-            text: "Failed to reset budget.\n$e",
+            text: "${loc.failedResetBudget}\n$e",
             isUser: false,
             timestamp: DateTime.now(),
           ));
@@ -472,6 +489,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
     Future<void> recordReminder(String text) async {
       try {
+        final loc = AppLocalizations.of(context);
         String response = await geminiService.extractReminder(text);
         response = response
             .replaceAll("```json", "")
@@ -498,7 +516,7 @@ class _AIChatPageState extends State<AIChatPage> {
                 iconColor: const Color(0xFFFF8F00),
                 bgColor: const Color(0xFFFFF8E1),
                 borderColor: const Color(0xFFFFE082),
-                title: "Reminder Set",
+                title: loc.reminderSet,
                 fields: {
                   "Title": reminder.title,
                   "Date": reminder.date,
@@ -511,7 +529,7 @@ class _AIChatPageState extends State<AIChatPage> {
         setState(() {
           messages.add(
             MessageModel(
-              text: "Failed to save reminder. Please try again.\n$e",
+              text: "${loc.failedSaveReminder}\n$e",
               isUser: false,
               timestamp: DateTime.now(),
             ),
@@ -523,6 +541,7 @@ class _AIChatPageState extends State<AIChatPage> {
   Future<void> analyzeMonthlySpending() async {
 
     try {
+      final loc = AppLocalizations.of(context);
 
       final transactions =
           await transactionRepository
@@ -598,7 +617,7 @@ class _AIChatPageState extends State<AIChatPage> {
       setState(() {
         messages.add(
           MessageModel(
-            text: "Failed to analyze spending.",
+            text: loc.failedAnalyze,
             isUser: false,
             timestamp: DateTime.now(),
           ),
@@ -613,6 +632,7 @@ class _AIChatPageState extends State<AIChatPage> {
       String text) async {
 
     try {
+      final loc = AppLocalizations.of(context);
 
       final transactions =
           await transactionRepository
@@ -667,7 +687,7 @@ class _AIChatPageState extends State<AIChatPage> {
         messages.add(
           MessageModel(
             text:
-                "Failed to create budget plan.",
+                loc.failedCreateBudget,
             isUser: false,
             timestamp: DateTime.now(),
           ),
@@ -680,6 +700,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
   Future<void> generateWeeklyCoach() async {
     try {
+      final loc = AppLocalizations.of(context);
       final dateService = await DateOverrideService.getInstance();
       final now = dateService.now();
       final daysFromMonday = now.weekday - 1;
@@ -752,7 +773,7 @@ class _AIChatPageState extends State<AIChatPage> {
     } catch (e) {
       setState(() {
         messages.add(MessageModel(
-          text: "Failed to generate weekly coaching insight.\n$e",
+          text: "${loc.failedWeekly}\n$e",
           isUser: false,
           timestamp: DateTime.now(),
         ));
@@ -762,6 +783,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
   child: Column(
@@ -781,7 +803,7 @@ class _AIChatPageState extends State<AIChatPage> {
                       itemBuilder: (context, index) {
                         if (index == messages.length) {
                           return ChatBubble(
-                            message: "Thinking...",
+                            message: loc.thinking,
                             isUser: false,
                             timestamp: DateTime.now(),
                           );
@@ -806,23 +828,23 @@ class _AIChatPageState extends State<AIChatPage> {
                     child: Row(
                       children: [
                         QuickActionChip(
-                          text: "✨ Record lunch \$15",
-                          onTap: () => messageController.text = "Record lunch \$15",
+                          text: "✨ ${loc.recordLunch}",
+                          onTap: () => messageController.text = loc.recordLunch,
                         ),
                         const SizedBox(width: 8),
                         QuickActionChip(
-                          text: "📊 Adjust my budget",
-                          onTap: () => messageController.text = "Adjust my budget",
+                          text: "📊 ${loc.adjustBudget}",
+                          onTap: () => messageController.text = loc.adjustBudget,
                         ),
                         const SizedBox(width: 8),
                         QuickActionChip(
-                          text: "💸 Set spending",
-                          onTap: () => messageController.text = "Set spending limit",
+                          text: "💸 ${loc.setSpending}",
+                          onTap: () => messageController.text = loc.setSpending,
                         ),
                         const SizedBox(width: 8),
                         QuickActionChip(
-                          text: "🔔 Set reminder",
-                          onTap: () => messageController.text = "Set reminder",
+                          text: "🔔 ${loc.setReminder}",
+                          onTap: () => messageController.text = loc.setReminder,
                         ),
                       ],
                     ),

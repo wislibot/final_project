@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/localization/app_localizations.dart';
 import '../../models/transaction_model.dart';
 import '../../core/services/budget_pacing_service.dart';
 import 'budget_chart.dart';
@@ -20,6 +21,7 @@ class ChartSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return DefaultTabController(
       length: 3,
       child: Container(
@@ -43,10 +45,10 @@ class ChartSection extends StatelessWidget {
               indicatorWeight: 3,
               labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-              tabs: const [
-                Tab(text: "Budget vs Spent"),
-                Tab(text: "Category"),
-                Tab(text: "Transactions"),
+              tabs: [
+                Tab(text: loc.budgetVsSpent),
+                Tab(text: loc.category),
+                Tab(text: loc.transactions),
               ],
             ),
             const SizedBox(height: 12),

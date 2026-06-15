@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project/l10n/app_localizations.dart';
 
 class OverviewCard extends StatelessWidget {
   final double monthlySpent;
@@ -14,6 +15,7 @@ class OverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -34,9 +36,9 @@ class OverviewCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Overview",
-                style: TextStyle(
+              Text(
+                loc.overview,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1A1A2E),
@@ -65,7 +67,7 @@ class OverviewCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatBox(
-                  label: "Monthly Spent",
+                  label: loc.monthlySpent,
                   value: "\$${monthlySpent.toStringAsFixed(2)}",
                   bgColor: const Color(0xFFF5F5F5),
                 ),
@@ -74,7 +76,7 @@ class OverviewCard extends StatelessWidget {
               Expanded(
                 child: budgetLimit > 0
                     ? _StatBox(
-                        label: "Budget Limit",
+                        label: loc.budgetLimit,
                         value: "\$${budgetLimit.toStringAsFixed(2)}",
                         bgColor: const Color(0xFFE8F5E9),
                       )
@@ -89,7 +91,7 @@ class OverviewCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatBox(
-                  label: "Today's Spending",
+                  label: loc.todaySpending,
                   value: "\$${todaySpent.toStringAsFixed(2)}",
                   bgColor: const Color(0xFFF5F5F5),
                 ),
@@ -97,7 +99,7 @@ class OverviewCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: _StatBox(
-                  label: "vs Last Month",
+                  label: loc.vsLastMonth,
                   value: "↓12%",
                   valueColor: const Color(0xFF00897B),
                   bgColor: const Color(0xFFE0F2F1),
@@ -161,6 +163,7 @@ class _StatBox extends StatelessWidget {
 class _SetBudgetPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () {
         // Navigate to AI Chat tab (index 1 in the bottom nav)
@@ -168,7 +171,7 @@ class _SetBudgetPrompt extends StatelessWidget {
         // Since we can't easily do that, we'll just show a snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Go to AI Assistant and say "Set budget \$2000"'),
+            content: Text(loc.goToAiBudget),
             action: SnackBarAction(
               label: 'OK',
               onPressed: () {},
@@ -189,7 +192,7 @@ class _SetBudgetPrompt extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Budget Limit",
+              loc.budgetLimit,
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
@@ -202,7 +205,7 @@ class _SetBudgetPrompt extends StatelessWidget {
                 Icon(Icons.add_circle_outline_rounded, size: 18, color: const Color(0xFF00BFA6)),
                 const SizedBox(width: 6),
                 Text(
-                  "Set a budget",
+                  loc.setABudget,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

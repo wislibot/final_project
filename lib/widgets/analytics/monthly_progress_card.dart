@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/localization/app_localizations.dart';
+
 class MonthlyProgressCard extends StatelessWidget {
   final double totalSpent;
   final double budgetLimit;
@@ -13,6 +15,7 @@ class MonthlyProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final String dateStr = DateFormat('EEEE, MMMM d').format(DateTime.now());
 
     return Container(
@@ -35,11 +38,12 @@ class MonthlyProgressCard extends StatelessWidget {
   }
 
   Widget _buildNoBudgetContent(BuildContext context, String dateStr) {
+    final loc = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Monthly Progress",
+        Text(
+          loc.monthlyProgress,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -56,7 +60,7 @@ class MonthlyProgressCard extends StatelessWidget {
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Go to AI Assistant and say "Set budget \$2000"'),
+                content: Text(loc.goToAiBudget),
                 action: SnackBarAction(label: 'OK', onPressed: () {}),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -77,7 +81,7 @@ class MonthlyProgressCard extends StatelessWidget {
                 Icon(Icons.add_circle_outline_rounded, size: 20, color: const Color(0xFF00BFA6)),
                 const SizedBox(width: 8),
                 Text(
-                  "Set a budget to track progress",
+                  loc.setBudgetTrack,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -93,6 +97,7 @@ class MonthlyProgressCard extends StatelessWidget {
   }
 
   Widget _buildProgressContent(BuildContext context, String dateStr) {
+    final loc = AppLocalizations.of(context);
     final double progress = (totalSpent / budgetLimit).clamp(0.0, 1.0);
     final int percentUsed = (progress * 100).round();
     final double remaining = budgetLimit - totalSpent;
@@ -104,8 +109,8 @@ class MonthlyProgressCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Monthly Progress",
+            Text(
+              loc.monthlyProgress,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -122,7 +127,7 @@ class MonthlyProgressCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                "$percentUsed% used",
+                "$percentUsed% ${loc.used}",
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -195,7 +200,7 @@ class MonthlyProgressCard extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  "remaining",
+                  loc.remaining,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[500],

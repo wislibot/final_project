@@ -97,6 +97,51 @@ class AppLocalizations {
       'traditional_chinese': 'Traditional Chinese',
       'language_changed': 'Language changed to English',
       'language_changed_zh': '語言已切換為繁體中文',
+      'set_a_budget': 'Set a budget',
+      'go_to_ai_budget': 'Go to AI Assistant and say "Set budget \$2000"',
+      'set_budget_track': 'Set a budget to track progress',
+      'budget_progress': 'Budget Progress',
+      'set_budget_see_progress': 'Set a budget to see progress',
+      'on_track': 'On track',
+      'caution': 'Caution',
+      'over_pace': 'Over pace',
+      'over_budget_label': 'Over budget',
+      'no_spending_yet': 'No spending yet',
+      'budget_exhausted': 'Budget exhausted',
+      'days_left_at': '{days} days left at \${rate}/day',
+      'keep_going': 'Keep Going',
+      'keep_going_desc': 'More data means better insights. Keep tracking!',
+      'first_month': 'First Month',
+      'steady_spending': 'Steady Spending',
+      'great_progress': 'Great Progress!',
+      'spending_up': 'Spending Up',
+      'over_budget_title': 'Over Budget',
+      'ahead_of_pace': 'Ahead of Pace',
+      'daily_average': 'Daily Average',
+      'welcome_message': 'Welcome! How can I help you manage your finances today?',
+      'suggest_breakdown': 'Here is a suggested budget breakdown. You can confirm or edit:',
+      'adjust_hint': 'You can say things like Set food budget to \$300 to adjust individual categories.',
+      'failed_record_expense': 'Failed to record expense.',
+      'failed_read_receipt': 'Failed to read receipt.',
+      'failed_set_budget': 'Failed to set budget. Please try again.',
+      'failed_save_budget': 'Failed to save budget.',
+      'no_budget_found': 'No budget found for this month. Say Set budget \$2000 to create one.',
+      'failed_reset_budget': 'Failed to reset budget.',
+      'failed_save_reminder': 'Failed to save reminder. Please try again.',
+      'failed_analyze': 'Failed to analyze spending.',
+      'failed_budget_plan': 'Failed to create budget plan.',
+      'failed_weekly': 'Failed to generate weekly coaching insight.',
+      'suggested_allocation': 'Suggested Allocation',
+      'confirmed_allocation': 'Confirmed Allocation',
+      'budget_confirmed': 'Budget Confirmed',
+      'budget_reset': 'Budget Reset',
+      'budget_recorded': 'Budget Recorded',
+      'budget_saved_msg': 'Budget set! Your allocation has been saved.',
+      'edit': 'Edit',
+      'confirm': 'Confirm',
+      'delete_transaction_btn': 'Delete Transaction',
+      'record_expense_btn': 'Record Expense',
+      'failed_create_budget': 'Failed to create budget plan.',
     },
     'zh': {
       'app_name': 'FinWise',
@@ -183,6 +228,51 @@ class AppLocalizations {
       'traditional_chinese': '繁體中文',
       'language_changed': 'Language changed to English',
       'language_changed_zh': '語言已切換為繁體中文',
+      'set_a_budget': '設定預算',
+      'go_to_ai_budget': '前往 AI 助理說「設定預算 \$2000」',
+      'set_budget_track': '設定預算以追蹤進度',
+      'budget_progress': '預算進度',
+      'set_budget_see_progress': '設定預算以查看進度',
+      'on_track': '正常',
+      'caution': '注意',
+      'over_pace': '超支',
+      'over_budget_label': '超出預算',
+      'no_spending_yet': '尚無支出',
+      'budget_exhausted': '預算已用完',
+      'days_left_at': '剩餘 {days} 天，每天 \${rate}',
+      'keep_going': '繼續加油',
+      'keep_going_desc': '更多數據意味著更好的洞察。繼續記錄！',
+      'first_month': '第一個月',
+      'steady_spending': '穩定支出',
+      'great_progress': '表現優秀！',
+      'spending_up': '支出增加',
+      'over_budget_title': '超出預算',
+      'ahead_of_pace': '支出超前',
+      'daily_average': '每日平均',
+      'welcome_message': '歡迎！今天我能幫您管理什麼財務呢？',
+      'suggest_breakdown': '這是建議的預算分配。您可以確認或編輯：',
+      'adjust_hint': '您可以說「設定食物預算為 \$300」來調整個別類別。',
+      'failed_record_expense': '記錄消費失敗。',
+      'failed_read_receipt': '讀取收據失敗。',
+      'failed_set_budget': '設定預算失敗，請重試。',
+      'failed_save_budget': '儲存預算失敗。',
+      'no_budget_found': '找不到本月預算。說「設定預算 \$2000」來建立。',
+      'failed_reset_budget': '重設預算失敗。',
+      'failed_save_reminder': '儲存提醒失敗，請重試。',
+      'failed_analyze': '分析支出失敗。',
+      'failed_budget_plan': '建立預算計畫失敗。',
+      'failed_weekly': '產生每週教練洞察失敗。',
+      'suggested_allocation': '建議配置',
+      'confirmed_allocation': '已確認配置',
+      'budget_confirmed': '預算已確認',
+      'budget_reset': '預算已重設',
+      'budget_recorded': '預算已記錄',
+      'budget_saved_msg': '預算已設定！您的配置已儲存。',
+      'edit': '編輯',
+      'confirm': '確 認',
+      'delete_transaction_btn': '刪除交易',
+      'record_expense_btn': '記錄消費',
+      'failed_create_budget': '建立預算計畫失敗。',
     },
   };
 
@@ -272,4 +362,48 @@ class AppLocalizations {
   String get traditionalChinese => tr('traditional_chinese');
   String get languageChanged => tr('language_changed');
   String get languageChangedZh => tr('language_changed_zh');
+  String get setABudget => tr('set_a_budget');
+  String get goToAiBudget => tr('go_to_ai_budget');
+  String get setBudgetTrack => tr('set_budget_track');
+  String get budgetProgress => tr('budget_progress');
+  String get setBudgetSeeProgress => tr('set_budget_see_progress');
+  String get onTrack => tr('on_track');
+  String get cautionLabel => tr('caution');
+  String get overPace => tr('over_pace');
+  String get overBudgetLabel => tr('over_budget_label');
+  String get noSpendingYet => tr('no_spending_yet');
+  String get budgetExhausted => tr('budget_exhausted');
+  String get keepGoing => tr('keep_going');
+  String get keepGoingDesc => tr('keep_going_desc');
+  String get firstMonth => tr('first_month');
+  String get steadySpending => tr('steady_spending');
+  String get greatProgress => tr('great_progress');
+  String get spendingUp => tr('spending_up');
+  String get overBudgetTitle => tr('over_budget_title');
+  String get aheadOfPace => tr('ahead_of_pace');
+  String get dailyAverage => tr('daily_average');
+  String get welcomeMessage => tr('welcome_message');
+  String get suggestBreakdown => tr('suggest_breakdown');
+  String get adjustHint => tr('adjust_hint');
+  String get failedRecordExpense => tr('failed_record_expense');
+  String get failedReadReceipt => tr('failed_read_receipt');
+  String get failedSetBudget => tr('failed_set_budget');
+  String get failedSaveBudget => tr('failed_save_budget');
+  String get noBudgetFound => tr('no_budget_found');
+  String get failedResetBudget => tr('failed_reset_budget');
+  String get failedSaveReminder => tr('failed_save_reminder');
+  String get failedAnalyze => tr('failed_analyze');
+  String get failedBudgetPlan => tr('failed_budget_plan');
+  String get failedWeekly => tr('failed_weekly');
+  String get suggestedAllocation => tr('suggested_allocation');
+  String get confirmedAllocation => tr('confirmed_allocation');
+  String get budgetConfirmed => tr('budget_confirmed');
+  String get budgetResetLabel => tr('budget_reset');
+  String get budgetRecorded => tr('budget_recorded');
+  String get budgetSavedMsg => tr('budget_saved_msg');
+  String get editLabel => tr('edit');
+  String get confirmLabel => tr('confirm');
+  String get deleteTransactionBtn => tr('delete_transaction_btn');
+  String get recordExpenseBtn => tr('record_expense_btn');
+  String get failedCreateBudget => tr('failed_create_budget');
 }

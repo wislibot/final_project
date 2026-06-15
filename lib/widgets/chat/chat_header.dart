@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localizations.dart';
 
 class ChatHeader extends StatelessWidget {
   const ChatHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
@@ -38,8 +40,8 @@ class ChatHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "AI Assistant",
+                  Text(
+                    loc.aiAssistant,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -59,7 +61,7 @@ class ChatHeader extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        "Ready to help",
+                        loc.readyToHelp,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 13,
@@ -69,7 +71,7 @@ class ChatHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    "Your smart financial companion",
+                    loc.smartCompanion,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.5),
                       fontSize: 12,

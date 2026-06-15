@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/localization/app_localizations.dart';
 import '../../core/services/budget_pacing_service.dart';
 
 class BudgetChart extends StatelessWidget {
@@ -55,16 +56,16 @@ class BudgetChart extends StatelessWidget {
     }
   }
 
-  String _getHealthLabel(String healthStatus) {
+  String _getHealthLabel(String healthStatus, AppLocalizations loc) {
     switch (healthStatus) {
       case 'on_track':
-        return 'On track';
+        return loc.onTrack;
       case 'caution':
-        return 'Caution';
+        return loc.cautionLabel;
       case 'over_pace':
-        return 'Over pace';
+        return loc.overPace;
       case 'over_budget':
-        return 'Over budget';
+        return loc.overBudgetLabel;
       default:
         return '';
     }
@@ -72,11 +73,12 @@ class BudgetChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Budget Progress",
+        Text(
+          loc.budgetProgress,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -93,7 +95,7 @@ class BudgetChart extends StatelessWidget {
                   Icon(Icons.savings_outlined, size: 48, color: Colors.grey[300]),
                   const SizedBox(height: 12),
                   Text(
-                    "Set a budget to see progress",
+                    loc.setBudgetSeeProgress,
                     style: TextStyle(color: Colors.grey[500], fontSize: 14),
                   ),
                 ],
@@ -114,10 +116,10 @@ class BudgetChart extends StatelessWidget {
                     ? (p.spent / p.allocated).clamp(0.0, 1.0)
                     : 0.0;
                 final daysLeftText = p.burnRate > 0 && p.daysUntilExhausted > 0
-                    ? '${p.daysUntilExhausted} days left at \$${p.burnRate.toStringAsFixed(0)}/day'
+                    ? loc.tr('days_left_at').replaceAll('{days}', p.daysUntilExhausted.toString()).replaceAll('{rate}', p.burnRate.toStringAsFixed(0))
                     : p.burnRate <= 0
-                        ? 'No spending yet'
-                        : 'Budget exhausted';
+                        ? loc.noSpendingYet
+                        : loc.budgetExhausted;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +160,7 @@ class BudgetChart extends StatelessWidget {
                         const SizedBox(width: 8),
                         // Health icon + label
                         Text(
-                          '${_getHealthIcon(p.healthStatus)} ${_getHealthLabel(p.healthStatus)}',
+                          '${_getHealthIcon(p.healthStatus)} ${_getHealthLabel(p.healthStatus, loc)}',
                           style: TextStyle(
                             fontSize: 11,
                             color: healthColor,

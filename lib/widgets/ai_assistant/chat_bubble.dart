@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../core/localization/app_localizations.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -17,6 +18,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final time = timestamp != null ? DateFormat('hh:mm a').format(timestamp!) : '';
 
     return Padding(
@@ -137,6 +139,7 @@ class ExpenseRecordedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Container(
       width: MediaQuery.of(context).size.width * 0.65,
       padding: const EdgeInsets.all(16),
@@ -154,7 +157,7 @@ class ExpenseRecordedCard extends StatelessWidget {
               Icon(Icons.check_circle_rounded, color: Colors.green.shade600, size: 20),
               const SizedBox(width: 8),
               Text(
-                "Expense Recorded",
+                loc.expenseRecorded,
                 style: TextStyle(
                   color: Colors.green.shade700,
                   fontWeight: FontWeight.w600,
@@ -232,6 +235,7 @@ class BudgetAllocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Container(
       width: MediaQuery.of(context).size.width * 0.72,
       padding: const EdgeInsets.all(16),
@@ -264,7 +268,7 @@ class BudgetAllocationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isConfirmed ? "Confirmed Allocation" : "Suggested Allocation",
+                      isConfirmed ? loc.confirmedAllocation : loc.suggestedAllocation,
                       style: TextStyle(
                         color: Colors.green.shade700,
                         fontWeight: FontWeight.w600,
@@ -333,7 +337,7 @@ class BudgetAllocationCard extends StatelessWidget {
                     onPressed: onEdit,
                     icon: Icon(Icons.edit_rounded, size: 16, color: Colors.grey[700]),
                     label: Text(
-                      "Edit",
+                      loc.editLabel,
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -349,8 +353,8 @@ class BudgetAllocationCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onConfirm,
                     icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-                    label: const Text(
-                      "Confirm",
+                    label: Text(
+                      loc.confirmLabel,
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
