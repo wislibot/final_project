@@ -15,6 +15,7 @@ import '../../core/services/speech_service.dart';
 
 import '../../repositories/budget_repository.dart';
 import '../../models/budget_model.dart';
+import '../../core/services/budget_allocation_service.dart';
 
 import '../../models/reminder_model.dart';
 import '../../repositories/reminder_repository.dart';
@@ -87,7 +88,7 @@ class _AIChatPageState extends State<AIChatPage> {
           break;
 
         case "budget":
-          await recordBudget(text);
+          await setMonthlyBudget(text);
           break;
 
         case "reminder":
@@ -264,21 +265,17 @@ class _AIChatPageState extends State<AIChatPage> {
 
       await speechService.startListening(
         (recognizedText) {
-
           setState(() {
-
             messageController.text =
                 recognizedText;
-
           });
-
         },
       );
-
     }
-    Future<void> recordBudget(String text) async {
+    Future<void> setMonthlyBudget(String text) async {
       try {
-        String response = await geminiService.extractBudget(text);
+        // 1. Extract total amount via Gemini
+        String response = await geminiService.extractBudgetAmount(text);
         response = response
             .replaceAll("```json", "")
             .replaceAll("```JSON", "")
@@ -286,42 +283,114 @@ class _AIChatPageState extends State<AIChatPage> {
             .trim();
 
         final data = jsonDecode(response);
-        final budget = BudgetModel(
-          category: data["category"],
-          limit: double.parse(data["limit"].toString()),
-        );
+        final double totalAmount = double.parse(data["amount"].toString());
 
-        await budgetRepository.addBudget(budget);
-
-        setState(() {
-          messages.add(
-            MessageModel(
-              text: "Budget set!",
+        if (totalAmount <= 0) {
+          setState(() {
+            messages.add(MessageModel(
+              text: "Please specify a budget amount greater than zero.",
               isUser: false,
               timestamp: DateTime.now(),
-              card: _buildInfoCard(
-                icon: Icons.account_balance_wallet_rounded,
-                iconColor: const Color(0xFF1976D2),
-                bgColor: const Color(0xFFE3F2FD),
-                borderColor: const Color(0xFF90CAF9),
-                title: "Budget Recorded",
-                fields: {
-                  "Category": budget.category,
-                  "Limit": "\$${budget.limit.toStringAsFixed(2)}",
-                },
-              ),
+            ));
+          });
+          return;
+        }
+
+        // 2. Fetch recent transactions for smart allocation
+        final transactions = await transactionRepository.fetchTransactions();
+        final now = DateTime.now();
+
+        // 3. Generate suggested allocation
+        final allocationService = BudgetAllocationService();
+        final suggestedBudgets = allocationService.suggestAllocation(
+          totalAmount,
+          now.month,
+          now.year,
+          recentTransactions: transactions,
+        );
+
+        // 4. Build allocations data for the card
+        final allocations = suggestedBudgets.map((b) {
+          return {
+            'category': b.category,
+            'amount': b.limit,
+            'percent': totalAmount > 0
+                ? (b.limit / totalAmount * 100)
+                : 0.0,
+          };
+        }).toList();
+
+        // 5. Show confirmation card
+        setState(() {
+          messages.add(MessageModel(
+            text: "Here's a suggested budget breakdown for \$${totalAmount.toStringAsFixed(0)}/month. You can confirm or edit:",
+            isUser: false,
+            timestamp: DateTime.now(),
+            card: BudgetAllocationCard(
+              totalBudget: totalAmount.toStringAsFixed(0),
+              allocations: allocations,
+              onConfirm: () => _confirmBudget(suggestedBudgets, totalAmount),
+              onEdit: () {
+                setState(() {
+                  messages.add(MessageModel(
+                    text: "You can say things like 'Set food budget to \$300' to adjust individual categories.",
+                    isUser: false,
+                    timestamp: DateTime.now(),
+                  ));
+                });
+              },
             ),
-          );
+          ));
         });
       } catch (e) {
         setState(() {
-          messages.add(
-            MessageModel(
-              text: "Failed to set budget. Please try again.\n$e",
-              isUser: false,
-              timestamp: DateTime.now(),
+          messages.add(MessageModel(
+            text: "Failed to set budget. Please try again.\n$e",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+        });
+      }
+    }
+
+    void _confirmBudget(List<BudgetModel> allocations, double totalAmount) async {
+      try {
+        final now = DateTime.now();
+        final budgetsWithMonth = allocations.map((b) => BudgetModel(
+          category: b.category,
+          limit: b.limit,
+          month: now.month,
+          year: now.year,
+        )).toList();
+
+        await budgetRepository.saveMonthlyBudgets(budgetsWithMonth);
+
+        setState(() {
+          messages.add(MessageModel(
+            text: "Budget set! Your \$${totalAmount.toStringAsFixed(0)}/month allocation has been saved.",
+            isUser: false,
+            timestamp: DateTime.now(),
+            card: _buildInfoCard(
+              icon: Icons.account_balance_wallet_rounded,
+              iconColor: const Color(0xFF1976D2),
+              bgColor: const Color(0xFFE3F2FD),
+              borderColor: const Color(0xFF90CAF9),
+              title: "Budget Recorded",
+              fields: {
+                "Total": "\$${totalAmount.toStringAsFixed(2)}",
+                "Categories": "${allocations.length} categories",
+                "Month": "${now.month}/${now.year}",
+              },
             ),
-          );
+          ));
+        });
+      } catch (e) {
+        setState(() {
+          messages.add(MessageModel(
+            text: "Failed to save budget.\n$e",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
         });
       }
     }
@@ -397,15 +466,38 @@ class _AIChatPageState extends State<AIChatPage> {
 
       }
 
+      final now = DateTime.now();
+      final budgets =
+          await budgetRepository.fetchBudgetsForMonth(
+              now.month, now.year);
+
       String summary =
           "Total spending: \$${total.toStringAsFixed(2)}\n";
 
+      if (budgets.isNotEmpty) {
+        summary += "Budget allocations:\n";
+        for (final b in budgets) {
+          summary +=
+              "  ${b.category}: \$${b.limit.toStringAsFixed(0)} allocated\n";
+        }
+      }
+
+      summary += "Category breakdown:\n";
       categories.forEach(
         (key, value) {
-
+          final budgeted = budgets.firstWhere(
+            (b) => b.category == key,
+            orElse: () => BudgetModel(
+                category: key, limit: 0),
+          );
+          final remaining = budgeted.limit - value;
           summary +=
-              "$key: \$${value.toStringAsFixed(2)}\n";
-
+              "  $key: \$${value.toStringAsFixed(2)} spent";
+          if (budgeted.limit > 0) {
+            summary +=
+                " / \$${budgeted.limit.toStringAsFixed(0)} budget (\$${remaining.toStringAsFixed(0)} remaining)";
+          }
+          summary += "\n";
         },
       );
 
@@ -428,7 +520,6 @@ class _AIChatPageState extends State<AIChatPage> {
     } catch (e) {
 
       setState(() {
-
         messages.add(
           MessageModel(
             text: "Failed to analyze spending.",
@@ -436,7 +527,6 @@ class _AIChatPageState extends State<AIChatPage> {
             timestamp: DateTime.now(),
           ),
         );
-
       });
 
     }
@@ -607,9 +697,7 @@ class _AIChatPageState extends State<AIChatPage> {
 
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
-
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.only(top: 8),

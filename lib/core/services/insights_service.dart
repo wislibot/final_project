@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../models/insight_model.dart';
 import '../../models/transaction_model.dart';
 import '../../models/budget_model.dart';
+import 'budget_pacing_service.dart';
 
 class InsightsService {
   List<InsightModel> generateInsights(
     List<TransactionModel> transactions,
-    List<BudgetModel> budgets,
-  ) {
+    List<BudgetModel> budgets, {
+    List<CategoryPacing>? pacingData,
+  }) {
     final insights = <InsightModel>[];
 
     if (transactions.isEmpty) {
@@ -32,6 +34,22 @@ class InsightsService {
 
     final dailyAvg = _calcDailyAverage(transactions);
     if (dailyAvg != null) insights.add(dailyAvg);
+
+    // Pacing-based insights
+    if (pacingData != null && pacingData.isNotEmpty) {
+      final pacingWarning = _calcPacingWarning(pacingData);
+      if (pacingWarning != null) insights.add(pacingWarning);
+
+      final onTrackCount = pacingData.where((p) => p.healthStatus == 'on_track').length;
+      if (onTrackCount == pacingData.length && pacingData.length > 1) {
+        insights.add(InsightModel(
+          icon: Icons.check_circle_rounded,
+          title: "All Categories On Track",
+          description: "Great job! All ${pacingData.length} categories are within pace.",
+          type: InsightType.positive,
+        ));
+      }
+    }
 
     if (insights.isEmpty) {
       insights.add(const InsightModel(
@@ -188,6 +206,32 @@ class InsightsService {
       title: "Daily Average",
       description: "You're averaging \$${dailyAvg.toStringAsFixed(0)}/day this month.",
       type: dailyAvg > 60 ? InsightType.warning : InsightType.positive,
+    );
+  }
+
+  /// Pacing-based insight: find the most at-risk category
+  InsightModel? _calcPacingWarning(List<CategoryPacing> pacing) {
+    CategoryPacing? worst;
+    for (final p in pacing) {
+      if (p.healthStatus == 'over_pace' || p.healthStatus == 'over_budget') {
+        if (worst == null || p.percentUsed > worst.percentUsed) {
+          worst = p;
+        }
+      }
+    }
+    if (worst == null) return null;
+
+    final icon = worst.healthStatus == 'over_budget'
+        ? Icons.error_rounded
+        : Icons.warning_amber_rounded;
+
+    return InsightModel(
+      icon: icon,
+      title: '${worst.category} Over Pace',
+      description: worst.healthStatus == 'over_budget'
+          ? '${worst.category} budget exceeded! \$${worst.spent.toStringAsFixed(0)} of \$${worst.allocated.toStringAsFixed(0)} spent.'
+          : '${worst.category} at ${worst.percentUsed.toStringAsFixed(0)}% with ${worst.daysUntilExhausted} days left.',
+      type: InsightType.warning,
     );
   }
 }

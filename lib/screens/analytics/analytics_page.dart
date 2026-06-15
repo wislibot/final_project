@@ -6,6 +6,7 @@ import '../../models/budget_model.dart';
 import '../../repositories/transaction_repository.dart';
 import '../../repositories/budget_repository.dart';
 import '../../core/services/insights_service.dart';
+import '../../core/services/budget_pacing_service.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../widgets/analytics/overview_card.dart';
 import '../../widgets/analytics/monthly_progress_card.dart';
@@ -102,21 +103,20 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               }
             }
 
-            final daysInRange = range.end.difference(range.start).inDays + 1;
-            final baseBudgetLimit = 1600.0;
-            final budgetLimit = _selectedPreset == 'This Week'
-                ? (baseBudgetLimit / 30 * 7)
-                : _selectedPreset == 'This Year'
-                    ? (baseBudgetLimit * 12)
-                    : _selectedPreset == 'All Time'
-                        ? (baseBudgetLimit * 12 * 2)
-                        : (baseBudgetLimit / 30 * daysInRange);
-
             return FutureBuilder<List<BudgetModel>>(
-              future: budgetRepository.fetchBudgets(),
+              future: budgetRepository.fetchBudgetsForMonth(now.month, now.year),
               builder: (context, budgetSnapshot) {
                 final budgets = budgetSnapshot.data ?? [];
-                final insights = insightsService.generateInsights(allTransactions, budgets);
+                final totalBudget = budgets.fold<double>(0, (sum, b) => sum + b.limit);
+                final budgetLimit = totalBudget > 0 ? totalBudget : 1600.0;
+
+                final pacingService = BudgetPacingService();
+                final pacingData = pacingService.computePacing(
+                  budgets: budgets,
+                  transactions: allTransactions.where((t) => t.type != 'income').toList(),
+                );
+
+                final insights = insightsService.generateInsights(allTransactions, budgets, pacingData: pacingData);
 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.only(bottom: 20),
@@ -201,6 +201,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                         child: ChartSection(
                           categoryTotals: categoryTotals,
                           transactions: allTransactions,
+                          pacingData: pacingData,
                         ),
                       ),
                     ],

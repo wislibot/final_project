@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/transaction_model.dart';
+import '../../core/services/budget_pacing_service.dart';
 import 'budget_chart.dart';
 import 'category_chart.dart';
 import 'transaction_list_tab.dart';
@@ -8,11 +9,13 @@ import 'transaction_list_tab.dart';
 class ChartSection extends StatelessWidget {
   final Map<String, double> categoryTotals;
   final List<TransactionModel> transactions;
+  final List<CategoryPacing> pacingData;
 
   const ChartSection({
     super.key,
     required this.categoryTotals,
     required this.transactions,
+    this.pacingData = const [],
   });
 
   @override
@@ -51,7 +54,7 @@ class ChartSection extends StatelessWidget {
               height: 320,
               child: TabBarView(
                 children: [
-                  BudgetChart(categoryTotals: categoryTotals),
+                  BudgetChart(pacingData: pacingData),
                   CategoryChart(categoryTotals: categoryTotals),
                   TransactionListTab(transactions: transactions),
                 ],

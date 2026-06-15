@@ -202,3 +202,166 @@ class ExpenseRecordedCard extends StatelessWidget {
     );
   }
 }
+
+// ── Budget allocation card ──
+class BudgetAllocationCard extends StatelessWidget {
+  final String totalBudget;
+  final List<Map<String, dynamic>> allocations;
+  final VoidCallback onConfirm;
+  final VoidCallback onEdit;
+
+  static const Map<String, Color> _categoryColors = {
+    'Food': Color(0xFF00BFA6),
+    'Transport': Color(0xFF1976D2),
+    'Shopping': Color(0xFFFFB300),
+    'Entertainment': Color(0xFFE91E63),
+    'Bills': Color(0xFF7C4DFF),
+    'Health': Color(0xFFFF7043),
+    'Other': Color(0xFF5C6BC0),
+  };
+
+  const BudgetAllocationCard({
+    super.key,
+    required this.totalBudget,
+    required this.allocations,
+    required this.onConfirm,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.72,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFA5D6A7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00BFA6).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: Color(0xFF00BFA6),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Suggested Allocation",
+                      style: TextStyle(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      "\$$totalBudget / month",
+                      style: const TextStyle(
+                        color: Color(0xFF1A1A2E),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 20),
+          // Category breakdown
+          ...allocations.map((allocation) {
+            final category = allocation['category'] as String;
+            final amount = allocation['amount'] as double;
+            final percent = allocation['percent'] as double;
+            final color = _categoryColors[category] ?? const Color(0xFF5C6BC0);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      category,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Text(
+                    "\$${amount.toStringAsFixed(0)}",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "${percent.toStringAsFixed(0)}%",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const Divider(height: 16),
+          // Action buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: Icon(Icons.edit_rounded, size: 16, color: Colors.grey[700]),
+                  label: Text(
+                    "Edit",
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.grey[300]!),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: onConfirm,
+                  icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+                  label: const Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00BFA6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -3,32 +3,61 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/budget_model.dart';
 
 class BudgetRepository {
-
   final FirebaseFirestore firestore =
       FirebaseFirestore.instance;
 
-  Future<void> addBudget(
-      BudgetModel budget) async {
-
-    await firestore
+  /// Save or update a budget for a specific month
+  Future<void> saveBudget(BudgetModel budget) async {
+    final query = await firestore
         .collection('budgets')
-        .add(
-          budget.toMap(),
-        );
+        .where('category', isEqualTo: budget.category)
+        .where('month', isEqualTo: budget.month)
+        .where('year', isEqualTo: budget.year)
+        .get();
+
+    if (query.docs.isNotEmpty) {
+      await query.docs.first.reference.update(budget.toMap());
+    } else {
+      await firestore
+          .collection('budgets')
+          .add(budget.toMap());
+    }
   }
 
-  Stream<QuerySnapshot> getBudgets() {
-
-    return firestore
-        .collection('budgets')
-        .snapshots();
-
+  /// Save all budgets for a month (bulk)
+  Future<void> saveMonthlyBudgets(
+      List<BudgetModel> budgets) async {
+    for (final b in budgets) {
+      await saveBudget(b);
+    }
   }
 
-  Future<List<BudgetModel>> fetchBudgets() async {
-    final snapshot = await firestore.collection('budgets').get();
+  /// Fetch budgets for a specific month
+  Future<List<BudgetModel>> fetchBudgetsForMonth(
+      int month, int year) async {
+    final snapshot = await firestore
+        .collection('budgets')
+        .where('month', isEqualTo: month)
+        .where('year', isEqualTo: year)
+        .get();
+
     return snapshot.docs
         .map((doc) => BudgetModel.fromMap(doc.data()))
         .toList();
+  }
+
+  /// Legacy: fetch all budgets
+  Future<List<BudgetModel>> fetchBudgets() async {
+    final snapshot =
+        await firestore.collection('budgets').get();
+    return snapshot.docs
+        .map((doc) => BudgetModel.fromMap(doc.data()))
+        .toList();
+  }
+
+  Stream<QuerySnapshot> getBudgets() {
+    return firestore
+        .collection('budgets')
+        .snapshots();
   }
 }

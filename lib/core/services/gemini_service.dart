@@ -107,6 +107,23 @@ class GeminiService {
     return response.text!.trim().toLowerCase();
   }
 
+  Future<String> extractBudgetAmount(String userMessage) async {
+    if (_model == null) return _unavailableMsg;
+    final prompt = """
+Extract the total monthly budget amount from the user's message.
+Return ONLY valid JSON.
+Schema:
+{"amount": 0}
+Example:
+User: Set my budget to 2000
+Output: {"amount": 2000}
+User message:
+$userMessage
+""";
+    final response = await _model!.generateContent([Content.text(prompt)]);
+    return response.text ?? "";
+  }
+
   Future<String> extractBudget(String userMessage) async {
     if (_model == null) return _unavailableMsg;
 
@@ -189,9 +206,13 @@ class GeminiService {
     if (_model == null) return _unavailableMsg;
 
     final prompt = """
-    You are an AI financial advisor.
-    Analyze the user's spending summary.
-    Give useful insights and recommendations.
+    You are a personal finance advisor for a student.
+    Analyze the user's spending summary WITH budget context.
+    Give specific, actionable advice:
+    1. Which categories are at risk?
+    2. Where can they cut back?
+    3. Are they on track for the month?
+    Be concise and direct. Use the budget numbers.
     Spending summary:
     $summary
     """;
