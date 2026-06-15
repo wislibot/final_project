@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class OverviewCard extends StatelessWidget {
   final double monthlySpent;
   final double todaySpent;
+  final double budgetLimit;
 
   const OverviewCard({
     super.key,
     required this.monthlySpent,
     required this.todaySpent,
+    required this.budgetLimit,
   });
 
   @override
@@ -72,7 +74,7 @@ class OverviewCard extends StatelessWidget {
               Expanded(
                 child: _StatBox(
                   label: "Budget Limit",
-                  value: "\$1,600.00",
+                  value: "\$${budgetLimit.toStringAsFixed(2)}",
                   bgColor: const Color(0xFFE8F5E9),
                 ),
               ),

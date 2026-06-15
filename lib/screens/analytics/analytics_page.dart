@@ -164,7 +164,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       // ── Overview Card ──
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent),
+                        child: OverviewCard(monthlySpent: totalSpent, todaySpent: todaySpent, budgetLimit: budgetLimit),
                       ),
 
                       const SizedBox(height: 16),
