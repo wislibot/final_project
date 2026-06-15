@@ -180,8 +180,9 @@ class _TransactionRow extends StatelessWidget {
 
   IconData _icon(String cat) {
     final c = cat.toLowerCase();
-    if (c.contains('food') || c.contains('lunch') || c.contains('dinner'))
+    if (c.contains('food') || c.contains('lunch') || c.contains('dinner')) {
       return Icons.restaurant_rounded;
+    }
     if (c.contains('transport')) return Icons.directions_car_rounded;
     if (c.contains('shopping')) return Icons.shopping_bag_rounded;
     if (c.contains('entertainment')) return Icons.movie_rounded;

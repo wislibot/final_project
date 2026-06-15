@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -127,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     loc.smartFinance,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 15,
                     ),
                   ),
@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         elevation: 2,
                         disabledBackgroundColor: const Color(0xFF00BFA6)
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                       ),
                       child: isLoading
                           ? const SizedBox(

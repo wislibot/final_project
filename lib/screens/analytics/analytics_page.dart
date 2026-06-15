@@ -174,7 +174,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   children: [
                     Text(loc.analytics, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
-                    Text(loc.financialInsights, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15)),
+                    Text(loc.financialInsights, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 15)),
                   ],
                 );
               },

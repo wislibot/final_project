@@ -24,9 +24,9 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-      context.read<LocalizationProvider>().loadSavedLanguage()
-    );
+    Future.microtask(() {
+      if (mounted) context.read<LocalizationProvider>().loadSavedLanguage();
+    });
   }
 
   @override

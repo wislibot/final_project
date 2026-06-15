@@ -96,7 +96,7 @@ class _LanguageOption extends StatelessWidget {
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
-              ? [BoxShadow(color: const Color(0xFF00BFA6).withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 3))]
+              ? [BoxShadow(color: const Color(0xFF00BFA6).withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 3))]
               : null,
         ),
         child: Row(

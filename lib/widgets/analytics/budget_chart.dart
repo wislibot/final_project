@@ -107,7 +107,7 @@ class BudgetChart extends StatelessWidget {
             child: ListView.separated(
               padding: const EdgeInsets.only(top: 4),
               itemCount: pacingData.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 14),
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
               itemBuilder: (context, index) {
                 final p = pacingData[index];
                 final catColor = _getCategoryColor(p.category);

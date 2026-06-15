@@ -98,7 +98,7 @@ class _Chip extends StatelessWidget {
             color: isSelected ? const Color(0xFF00BFA6) : Colors.grey.shade300,
           ),
           boxShadow: isSelected
-              ? [BoxShadow(color: const Color(0xFF00BFA6).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))]
+              ? [BoxShadow(color: const Color(0xFF00BFA6).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
               : null,
         ),
         child: Row(

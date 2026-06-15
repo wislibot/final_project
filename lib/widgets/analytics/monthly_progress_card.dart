@@ -15,7 +15,6 @@ class MonthlyProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
     final String dateStr = DateFormat('EEEE, MMMM d').format(DateTime.now());
 
     return Container(
@@ -25,7 +24,7 @@ class MonthlyProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -73,7 +72,7 @@ class MonthlyProgressCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF00BFA6).withOpacity(0.3), width: 1.5),
+              border: Border.all(color: const Color(0xFF00BFA6).withValues(alpha: 0.3), width: 1.5),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -29,7 +29,7 @@ class GeminiService {
 
   Future<String> sendMessage(String message) async {
     if (_model == null) return _unavailableMsg;
-    final response = await _model!.generateContent([Content.text(message)]);
+    final response = await _model.generateContent([Content.text(message)]);
     return response.text ?? "";
   }
 
@@ -70,7 +70,7 @@ class GeminiService {
         $userMessage
         """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -110,7 +110,7 @@ class GeminiService {
           $userMessage
           """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text!.trim().toLowerCase();
   }
 
@@ -127,7 +127,7 @@ Output: {"amount": 2000}
 User message:
 $userMessage
 """;
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -146,7 +146,7 @@ $userMessage
     $userMessage
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -172,7 +172,7 @@ $userMessage
     $userMessage
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -199,7 +199,7 @@ $userMessage
     }
     """;
 
-    final response = await _model!.generateContent([
+    final response = await _model.generateContent([
       Content.multi([
         TextPart(prompt),
         DataPart("image/jpeg", imageBytes),
@@ -224,7 +224,7 @@ $userMessage
     $summary
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -242,7 +242,7 @@ $userMessage
     $weeklySummary
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -263,7 +263,7 @@ $userMessage
     Provide practical recommendations.
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 
@@ -277,7 +277,7 @@ $userMessage
     $summary
     """;
 
-    final response = await _model!.generateContent([Content.text(prompt)]);
+    final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? "";
   }
 }

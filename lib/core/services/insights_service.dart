@@ -152,7 +152,7 @@ class InsightsService {
       title: isOnTrack ? "On Track" : "Ahead of Pace",
       description: isOnTrack
           ? "You're ${percent.toStringAsFixed(0)}% through your monthly budget with great pacing."
-          : "You're ${percent.toStringAsFixed(0)}% through your budget but only ${dayOfMonth}/${daysInMonth} days in.",
+          : "You're ${percent.toStringAsFixed(0)}% through your budget but only $dayOfMonth/$daysInMonth days in.",
       type: isOnTrack ? InsightType.positive : InsightType.warning,
     );
   }

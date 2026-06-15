@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:final_project/l10n/app_localizations.dart';
+import '../../core/localization/app_localizations.dart';
 
 class OverviewCard extends StatelessWidget {
   final double monthlySpent;
@@ -23,7 +23,7 @@ class OverviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -186,7 +186,7 @@ class _SetBudgetPrompt extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF00BFA6).withOpacity(0.3), width: 1.5),
+          border: Border.all(color: const Color(0xFF00BFA6).withValues(alpha: 0.3), width: 1.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

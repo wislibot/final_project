@@ -112,7 +112,7 @@ class _SignupPageState extends State<SignupPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -138,7 +138,7 @@ class _SignupPageState extends State<SignupPage> {
                   Text(
                     loc.createYourAccount,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 15,
                     ),
                   ),
@@ -219,7 +219,7 @@ class _SignupPageState extends State<SignupPage> {
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 2,
-                        disabledBackgroundColor: const Color(0xFF00BFA6).withOpacity(0.6),
+                        disabledBackgroundColor: const Color(0xFF00BFA6).withValues(alpha: 0.6),
                       ),
                       child: isLoading
                           ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))

@@ -63,7 +63,7 @@ class ChatHeader extends StatelessWidget {
                       Text(
                         loc.readyToHelp,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -73,7 +73,7 @@ class ChatHeader extends StatelessWidget {
                   Text(
                     loc.smartCompanion,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 12,
                     ),
                   ),

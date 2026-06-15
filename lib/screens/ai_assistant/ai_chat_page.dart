@@ -156,8 +156,8 @@ class _AIChatPageState extends State<AIChatPage> {
   }
  
   Future<void> recordExpense(String text) async {
+    final loc = AppLocalizations.of(context);
     try {
-      final loc = AppLocalizations.of(context);
       String response = await geminiService.extractExpense(text);
       response = response
           .replaceAll("```json", "")
@@ -205,8 +205,8 @@ class _AIChatPageState extends State<AIChatPage> {
   }
 
   Future<void> processReceipt() async {
+      final loc = AppLocalizations.of(context);
       try {
-        final loc = AppLocalizations.of(context);
         final image = await imageService.pickImage();
 
         if (image == null) return;
@@ -290,8 +290,8 @@ class _AIChatPageState extends State<AIChatPage> {
       );
     }
     Future<void> setMonthlyBudget(String text) async {
+      final loc = AppLocalizations.of(context);
       try {
-        final loc = AppLocalizations.of(context);
         // 1. Extract total amount via Gemini
         String response = await geminiService.extractBudgetAmount(text);
         response = response
@@ -372,8 +372,8 @@ class _AIChatPageState extends State<AIChatPage> {
     }
 
     void _confirmBudget(List<BudgetModel> allocations, double totalAmount) async {
+      final loc = AppLocalizations.of(context);
       try {
-        final loc = AppLocalizations.of(context);
         final now = DateTime.now();
         final budgetsWithMonth = allocations.map((b) => BudgetModel(
           category: b.category,
@@ -443,8 +443,8 @@ class _AIChatPageState extends State<AIChatPage> {
     }
 
     Future<void> resetBudget() async {
+      final loc = AppLocalizations.of(context);
       try {
-        final loc = AppLocalizations.of(context);
         final now = DateTime.now();
         final deleted = await budgetRepository.deleteBudgetsForMonth(now.month, now.year);
 
@@ -488,8 +488,8 @@ class _AIChatPageState extends State<AIChatPage> {
     }
 
     Future<void> recordReminder(String text) async {
+      final loc = AppLocalizations.of(context);
       try {
-        final loc = AppLocalizations.of(context);
         String response = await geminiService.extractReminder(text);
         response = response
             .replaceAll("```json", "")
@@ -539,9 +539,8 @@ class _AIChatPageState extends State<AIChatPage> {
     }
 
   Future<void> analyzeMonthlySpending() async {
-
+    final loc = AppLocalizations.of(context);
     try {
-      final loc = AppLocalizations.of(context);
 
       final transactions =
           await transactionRepository
@@ -630,9 +629,8 @@ class _AIChatPageState extends State<AIChatPage> {
 
   Future<void> createBudgetPlan(
       String text) async {
-
+    final loc = AppLocalizations.of(context);
     try {
-      final loc = AppLocalizations.of(context);
 
       final transactions =
           await transactionRepository
@@ -699,8 +697,8 @@ class _AIChatPageState extends State<AIChatPage> {
   }
 
   Future<void> generateWeeklyCoach() async {
+    final loc = AppLocalizations.of(context);
     try {
-      final loc = AppLocalizations.of(context);
       final dateService = await DateOverrideService.getInstance();
       final now = dateService.now();
       final daysFromMonday = now.weekday - 1;
@@ -756,7 +754,7 @@ class _AIChatPageState extends State<AIChatPage> {
         buffer.writeln("\nCategory trends:");
         for (final entry in trends.categoryTrends.entries) {
           final arrow = entry.value > 0 ? '↑' : '↓';
-          buffer.writeln("  ${entry.key}: ${arrow}${entry.value.abs().toStringAsFixed(1)}%");
+          buffer.writeln("  ${entry.key}: $arrow${entry.value.abs().toStringAsFixed(1)}%");
         }
       }
 

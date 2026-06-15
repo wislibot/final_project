@@ -80,7 +80,7 @@ class TransactionChart extends StatelessWidget {
             ),
             belowBarData: BarAreaData(
               show: true,
-              color: const Color(0xFF00BFA6).withOpacity(0.1),
+              color: const Color(0xFF00BFA6).withValues(alpha: 0.1),
             ),
             spots: const [
               FlSpot(1, 80),

@@ -120,7 +120,7 @@ class _DebugSectionState extends State<DebugSection> {
               ),
               Switch(
                 value: _isEnabled,
-                activeColor: Colors.orange.shade700,
+                activeThumbColor: Colors.orange.shade700,
                 onChanged: (value) {
                   if (value) {
                     _pickDate();

@@ -26,7 +26,7 @@ class SettingsSection extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color:
-                Colors.black.withOpacity(
+                Colors.black.withValues(alpha: 
               0.04,
             ),
 
