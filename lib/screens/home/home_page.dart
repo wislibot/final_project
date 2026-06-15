@@ -86,17 +86,17 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isActive ? const Color(0xFF00BFA6) : Colors.grey, size: 28),
-            const SizedBox(height: 4),
+            Icon(icon, color: isActive ? const Color(0xFF00BFA6) : Colors.grey, size: 24),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: isActive ? const Color(0xFF00BFA6) : Colors.grey,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),

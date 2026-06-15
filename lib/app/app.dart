@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../screens/splash/splash_screen.dart';
 import '../theme/light_theme.dart';
@@ -50,6 +51,9 @@ class _AppState extends State<App> {
       ],
       localizationsDelegates: const [
         _AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       theme: LightTheme.theme,
       darkTheme: DarkTheme.theme,
