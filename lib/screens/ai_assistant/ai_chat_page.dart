@@ -90,6 +90,10 @@ class _AIChatPageState extends State<AIChatPage> {
           await setMonthlyBudget(text);
           break;
 
+        case "reset":
+          await resetBudget();
+          break;
+
         case "reminder":
           await recordReminder(text);
           break;
@@ -421,6 +425,51 @@ class _AIChatPageState extends State<AIChatPage> {
         });
       }
     }
+
+    Future<void> resetBudget() async {
+      try {
+        final now = DateTime.now();
+        final deleted = await budgetRepository.deleteBudgetsForMonth(now.month, now.year);
+
+        if (deleted > 0) {
+          setState(() {
+            messages.add(MessageModel(
+              text: "Budget reset! Deleted $deleted budget categories for this month.",
+              isUser: false,
+              timestamp: DateTime.now(),
+              card: _buildInfoCard(
+                icon: Icons.delete_sweep_rounded,
+                iconColor: const Color(0xFFE53935),
+                bgColor: const Color(0xFFFFEBEE),
+                borderColor: const Color(0xFFEF9A9A),
+                title: "Budget Reset",
+                fields: {
+                  "Month": "${now.month}/${now.year}",
+                  "Deleted": "$deleted categories",
+                },
+              ),
+            ));
+          });
+        } else {
+          setState(() {
+            messages.add(MessageModel(
+              text: "No budget found for this month. Say \"Set budget \$2000\" to create one.",
+              isUser: false,
+              timestamp: DateTime.now(),
+            ));
+          });
+        }
+      } catch (e) {
+        setState(() {
+          messages.add(MessageModel(
+            text: "Failed to reset budget.\n$e",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+        });
+      }
+    }
+
     Future<void> recordReminder(String text) async {
       try {
         String response = await geminiService.extractReminder(text);

@@ -84,6 +84,7 @@ class GeminiService {
           Possible values:
           expense
           budget
+          reset
           reminder
           planner
           analysis
@@ -95,6 +96,12 @@ class GeminiService {
           expense
           Set my food budget to \$300
           budget
+          Reset my budget
+          reset
+          Clear my budget plan
+          reset
+          Delete my budget
+          reset
           Remind me to pay rent tomorrow
           reminder
           Hello, how are you?

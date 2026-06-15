@@ -60,4 +60,31 @@ class BudgetRepository {
         .collection('budgets')
         .snapshots();
   }
+
+  /// Delete all budgets for a specific month
+  Future<int> deleteBudgetsForMonth(int month, int year) async {
+    final snapshot = await firestore
+        .collection('budgets')
+        .where('month', isEqualTo: month)
+        .where('year', isEqualTo: year)
+        .get();
+
+    int count = 0;
+    for (final doc in snapshot.docs) {
+      await doc.reference.delete();
+      count++;
+    }
+    return count;
+  }
+
+  /// Delete all budgets
+  Future<int> deleteAllBudgets() async {
+    final snapshot = await firestore.collection('budgets').get();
+    int count = 0;
+    for (final doc in snapshot.docs) {
+      await doc.reference.delete();
+      count++;
+    }
+    return count;
+  }
 }
